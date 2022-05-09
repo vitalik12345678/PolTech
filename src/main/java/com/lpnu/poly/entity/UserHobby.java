@@ -1,14 +1,19 @@
 package com.lpnu.poly.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "user_hobby")
 public class UserHobby {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hobby_id")
     private Hobby hobby;
@@ -16,30 +21,4 @@ public class UserHobby {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Hobby getHobby() {
-        return hobby;
-    }
-
-    public void setHobby(Hobby hobby) {
-        this.hobby = hobby;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    //TODO Reverse Engineering! Migrate other columns to the entity
 }
