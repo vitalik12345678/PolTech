@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -13,7 +14,6 @@ import java.util.Set;
 public class Chat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -25,8 +25,8 @@ public class Chat {
     private User secondUser;
 
     @OneToMany(mappedBy = "chat")
-    private Set<File> files;
+    private List<File> files;
 
     @OneToMany(mappedBy = "chat")
-    private Set<Message> messages;
+    private List<Message> messages;
 }
