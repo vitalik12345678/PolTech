@@ -1,12 +1,19 @@
 package com.lpnu.poly.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.GeneratorType;
+
 import javax.persistence.*;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "post_branch")
 public class PostBranch {
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
@@ -15,28 +22,4 @@ public class PostBranch {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
-
-    public Branch getBranch() {
-        return branch;
-    }
-
-    public void setBranch(Branch branch) {
-        this.branch = branch;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }
