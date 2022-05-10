@@ -15,7 +15,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -40,6 +39,10 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avatar")
     private File avatar;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "graduate")
+    private Type graduate;
 
     @OneToMany(mappedBy = "owner")
     private List<Party> parties;
