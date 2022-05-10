@@ -41,6 +41,10 @@ public class User {
     @JoinColumn(name = "avatar")
     private File avatar;
 
+    @ManyToOne
+    @JoinColumn(name = "role")
+    private Role role;
+
     @OneToMany(mappedBy = "owner")
     private List<Party> parties;
 
