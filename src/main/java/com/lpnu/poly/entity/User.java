@@ -1,15 +1,22 @@
 package com.lpnu.poly.entity;
 
+import com.lpnu.poly.type.PostgresSQLEnumType;
+import com.lpnu.poly.type.Graduate;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
+import org.hibernate.annotations.TypeDef;
+
+
 
 @Getter
 @Setter
 @Entity
 @Table(name = "users")
+@TypeDef(name = "enum_type", typeClass = PostgresSQLEnumType.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +43,11 @@ public class User {
 
     @Column(name = "middle_name", nullable = false, length = 30)
     private String middleName;
+
+    @Enumerated(EnumType.STRING)
+    @Type(type = "enum_type")
+    @Column(columnDefinition = "graduate")
+    private Graduate genre;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avatar")
