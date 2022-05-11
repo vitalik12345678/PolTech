@@ -1,7 +1,6 @@
 package com.lpnu.poly.entity;
 
 import com.lpnu.poly.type.PostgresSQLEnumType;
-import com.lpnu.poly.type.Graduate;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;

@@ -1,4 +1,4 @@
-package com.lpnu.poly.type;
+package com.lpnu.poly.entity;
 
 public enum Graduate {
     СТУДЕНТ, ВИПУСКНИК, ВИКЛАДАЧ

@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "post")
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,9 +27,6 @@ public class Post {
 
     @Column(name = "title", nullable = false, length = 60)
     private String title;
-
-    @Column(name = "estimat")
-    private Integer estimat;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "files_id")
