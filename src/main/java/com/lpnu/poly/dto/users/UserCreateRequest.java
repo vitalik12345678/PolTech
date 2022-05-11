@@ -1,12 +1,14 @@
 package com.lpnu.poly.dto.users;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.*;
 import java.util.List;
 
-@Data
-public class UserCreateProfile {
+@Setter
+@Getter
+public class UserCreateRequest {
     @NotBlank
     @Email
     private String email;
@@ -23,13 +25,13 @@ public class UserCreateProfile {
     @NotBlank
     private List<String> branch;
 
-//    @NotBlank
-//    private String graduate;
+    @NotBlank
+    private String graduate;
 
     private String work;
 
-//    @NotBlank
-//    private String hobby;
+    @NotBlank
+    private String hobby;
 
     @NotBlank
     @Pattern(regexp = "^[А-Яа-я]*$")
@@ -45,11 +47,11 @@ public class UserCreateProfile {
 
 }
 //{
-//        "email":"dsfsfsdf7@gmail.com",
-//        "password":"123asdasdasdg",
-//        "graduationYear":"2000",
-//        "work":"Lector",
-//        "firstName" : "test",
-//        "lastName" : "test",
-//        "middleName" : "test"
+/*        "email":"dsfsfsdf7@gmail.com",
+        "password":"123asdasdasdg",
+        "graduationYear":"2000",
+        "work":"Lector",
+        "firstName" : "test",
+        "lastName" : "test",
+        "middleName" : "test"*/
 //}

@@ -1,10 +1,9 @@
 package com.lpnu.poly.controllers;
 
-import com.lpnu.poly.dto.users.UserCreateProfile;
-import com.lpnu.poly.dto.users.UserGetProfile;
-import com.lpnu.poly.dto.users.UsersUpdateProfile;
-import com.lpnu.poly.entity.User;
-import com.lpnu.poly.service.UsersService;
+import com.lpnu.poly.dto.users.UserCreateRequest;
+import com.lpnu.poly.dto.users.UserProfileResponse;
+import com.lpnu.poly.dto.users.UserUpdateRequest;
+import com.lpnu.poly.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,39 +15,39 @@ import java.util.List;
 @RequestMapping("api/user")
 public class UserController {
 
-        private final UsersService usersService;
+        private final UserService userService;
 
         @Autowired
-        public UserController(UsersService usersService) {
-            this.usersService = usersService;
+        public UserController(UserService userService) {
+            this.userService = userService;
         }
 
         @PostMapping(value = "/v1/")
-        public ResponseEntity<UserCreateProfile> createUser(@Valid @RequestBody UserCreateProfile userCreateProfile){
-            return usersService.createUser(userCreateProfile);
+        public ResponseEntity<UserCreateRequest> createUser(@RequestBody UserCreateRequest userCreateRequest){
+            return userService.createUser(userCreateRequest);
         }
 
 
         @PutMapping(value = "/v1/{id}")
-        public ResponseEntity<UsersUpdateProfile> updateUser(@PathVariable("id") Long id,
-                                                    @Valid
+        public ResponseEntity<UserUpdateRequest> updateUser(@PathVariable("id") Long id,
+                                                            @Valid
                                                     @RequestBody
-                                                            UsersUpdateProfile usersUpdateProfile){
-            return usersService.updateUser(id,usersUpdateProfile);
+                                                                    UserUpdateRequest userUpdateRequest){
+            return userService.updateUser(id, userUpdateRequest);
         }
 
         @DeleteMapping(value = "/v1/{id}")
-        public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
-            return usersService.deleteUser(id);
+        public ResponseEntity<UserProfileResponse> deleteUser(@PathVariable("id") Long id){
+            return userService.deleteUser(id);
         }
 
         @GetMapping(value = "/v1/allUsers")
-        public ResponseEntity<List<UserGetProfile>> getAllUsers(){
-            return usersService.getAllUsers();
+        public ResponseEntity<List<UserProfileResponse>> getAllUsers(){
+            return userService.getAllUsers();
         }
 
         @GetMapping(value = "/v1/{id}")
-        public ResponseEntity<UserGetProfile> findUser(@PathVariable("id")Long id){
-            return usersService.findUser(id);
+        public ResponseEntity<UserProfileResponse> findUser(@PathVariable("id")Long id){
+            return userService.findUser(id);
         }
 }

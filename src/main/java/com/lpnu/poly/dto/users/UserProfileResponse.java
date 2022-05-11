@@ -2,10 +2,8 @@ package com.lpnu.poly.dto.users;
 
 import lombok.Data;
 
-import javax.validation.constraints.*;
-
 @Data
-public class UserGetProfile {
+public class UserProfileResponse {
 
         private Integer graduationYear;
 

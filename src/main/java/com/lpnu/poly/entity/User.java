@@ -1,7 +1,6 @@
 package com.lpnu.poly.entity;
 
 import com.lpnu.poly.type.PostgresSQLEnumType;
-import com.lpnu.poly.type.Graduate;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -16,13 +15,12 @@ import org.hibernate.annotations.TypeDef;
 @Setter
 @Entity
 @Table(name = "users")
-@TypeDef(name = "enum_type", typeClass = PostgresSQLEnumType.class)
+@TypeDef(name = "pgsql_enum", typeClass = PostgresSQLEnumType.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -45,9 +43,9 @@ public class User {
     private String middleName;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "enum_type")
-    @Column(columnDefinition = "graduate")
-    private Graduate genre;
+    @Type(type = "pgsql_enum")
+    @Column(columnDefinition = "user_type")
+    private Graduate graduate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avatar")

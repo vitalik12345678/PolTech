@@ -2,7 +2,7 @@ package com.lpnu.poly.dto.users;
 
 import javax.validation.constraints.*;
 
-public class UsersUpdateProfile {
+public class UserUpdateRequest {
 
     @NotEmpty
     @Min(1960)
