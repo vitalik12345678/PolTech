@@ -1,6 +1,7 @@
 package com.lpnu.poly.controllers;
 
 import com.lpnu.poly.dto.users.UserCreateProfile;
+import com.lpnu.poly.dto.users.UserGetProfile;
 import com.lpnu.poly.dto.users.UsersUpdateProfile;
 import com.lpnu.poly.entity.User;
 import com.lpnu.poly.service.UsersService;
@@ -12,7 +13,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/user")
 public class UserController {
 
         private final UsersService usersService;
@@ -23,13 +24,13 @@ public class UserController {
         }
 
         @PostMapping(value = "/v1/")
-        public ResponseEntity<User> createUser(@Valid @RequestBody UserCreateProfile userCreateProfile){
+        public ResponseEntity<UserCreateProfile> createUser(@Valid @RequestBody UserCreateProfile userCreateProfile){
             return usersService.createUser(userCreateProfile);
         }
 
 
         @PutMapping(value = "/v1/{id}")
-        public ResponseEntity<User> updateUser(@PathVariable("id") Long id,
+        public ResponseEntity<UsersUpdateProfile> updateUser(@PathVariable("id") Long id,
                                                     @Valid
                                                     @RequestBody
                                                             UsersUpdateProfile usersUpdateProfile){
@@ -42,12 +43,12 @@ public class UserController {
         }
 
         @GetMapping(value = "/v1/allUsers")
-        public ResponseEntity<List<User>> getAllUsers(){
+        public ResponseEntity<List<UserGetProfile>> getAllUsers(){
             return usersService.getAllUsers();
         }
 
         @GetMapping(value = "/v1/{id}")
-        public ResponseEntity<User> findUser(@PathVariable("id")Long id){
+        public ResponseEntity<UserGetProfile> findUser(@PathVariable("id")Long id){
             return usersService.findUser(id);
         }
 }

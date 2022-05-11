@@ -3,6 +3,7 @@ package com.lpnu.poly.dto.users;
 import lombok.Data;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Data
 public class UserCreateProfile {
@@ -19,9 +20,9 @@ public class UserCreateProfile {
     @Max(2300)
     private Integer graduationYear;
 
-//    @NotBlank
-//    private String branch;
-//
+    @NotBlank
+    private List<String> branch;
+
 //    @NotBlank
 //    private String graduate;
 
