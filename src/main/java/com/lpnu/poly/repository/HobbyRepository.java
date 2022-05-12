@@ -1,17 +1,16 @@
 package com.lpnu.poly.repository;
 
-import com.lpnu.poly.entity.Branch;
+import com.lpnu.poly.entity.Hobby;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
+public interface HobbyRepository extends JpaRepository<Hobby,Long> {
 
-public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Override
-    Optional<Branch> findById(Long id);
+    Optional<Hobby> findById(Long id);
 
-    Optional<Branch> findByName (String name);
-
+    Optional<Hobby> findByName(String name);
 }

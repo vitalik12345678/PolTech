@@ -1,5 +1,6 @@
 package com.lpnu.poly.entity;
 
+import com.lpnu.poly.entity.mapper.Convertable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +13,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "post")
-public class Post {
+public class Post implements Convertable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,9 +28,6 @@ public class Post {
 
     @Column(name = "title", nullable = false, length = 60)
     private String title;
-
-    @Column(name = "estimat")
-    private Integer estimat;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "files_id")

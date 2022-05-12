@@ -45,6 +45,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Type(type = "pgsql_enum")
     @Column(columnDefinition = "user_type")
+
     private Graduate graduate;
 
     @ManyToOne(fetch = FetchType.LAZY)
