@@ -1,5 +1,7 @@
 package com.lpnu.poly.entity;
 
 public enum Graduate {
-    СТУДЕНТ, ВИПУСКНИК, ВИКЛАДАЧ
+
+    студент, випускник, викладач
+
 }
