@@ -1,8 +1,8 @@
 package com.lpnu.poly.service;
 
-import com.lpnu.poly.DTO.post.CreatePostRequest;
+import com.lpnu.poly.DTO.post.PostCreateRequest;
 import com.lpnu.poly.DTO.post.PostProfileResponse;
-import com.lpnu.poly.DTO.post.UpdatePostRequest;
+import com.lpnu.poly.DTO.post.PostUpdateRequest;
 import org.springframework.http.ResponseEntity;
 
 public interface PostService {
@@ -11,8 +11,8 @@ public interface PostService {
 
     ResponseEntity<PostProfileResponse> deletePost(Long id);
 
-    ResponseEntity<PostProfileResponse> createPost(CreatePostRequest createPostRequest);
+    ResponseEntity<PostProfileResponse> createPost(PostCreateRequest postCreateRequest);
 
-    ResponseEntity<PostProfileResponse> updatePost(UpdatePostRequest updatePostRequest);
+    ResponseEntity<PostProfileResponse> updatePost(PostUpdateRequest postUpdateRequest);
 
 }

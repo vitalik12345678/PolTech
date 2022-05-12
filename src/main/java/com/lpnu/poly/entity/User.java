@@ -21,7 +21,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -46,7 +45,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Type(type = "enum_type")
     @Column(columnDefinition = "graduate")
-    private Graduate genre;
+    private Graduate graduate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avatar")

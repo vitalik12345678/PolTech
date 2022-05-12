@@ -1,13 +1,13 @@
 package com.lpnu.poly.DTO.post;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.lpnu.poly.entity.mapper.Convertable;
+import lombok.*;
 
 @Getter
 @Setter
-public class PostProfileResponse {
+@AllArgsConstructor
+@NoArgsConstructor
+public class PostProfileResponse implements Convertable {
 
     private String title;
-    private String description;
-
 }

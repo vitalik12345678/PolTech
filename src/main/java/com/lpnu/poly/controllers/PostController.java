@@ -1,13 +1,14 @@
 package com.lpnu.poly.controllers;
 
+import com.lpnu.poly.DTO.post.PostCreateRequest;
 import com.lpnu.poly.DTO.post.PostProfileResponse;
+import com.lpnu.poly.DTO.post.PostUpdateRequest;
 import com.lpnu.poly.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("api/post/")
@@ -25,5 +26,20 @@ public class PostController {
         return postService.getPost(id);
     }
 
+    @PostMapping("v1")
+    public ResponseEntity<PostProfileResponse> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest){
+        return postService.createPost(postCreateRequest);
+    }
+
+    @DeleteMapping("v1/{id}")
+    public ResponseEntity<PostProfileResponse> deletePost(@PathVariable("id")Long id){
+        return postService.deletePost(id);
+    }
+
+    @PutMapping("v1/{id}")
+    public ResponseEntity<PostProfileResponse> updatePost(@PathVariable("id")Long id,
+                                                          @RequestBody PostUpdateRequest postUpdateRequest){
+        return postService.updatePost(postUpdateRequest);
+    }
 
 }
