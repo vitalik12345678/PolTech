@@ -1,8 +1,8 @@
 package com.lpnu.poly.controllers;
 
-import com.lpnu.poly.dto.users.UserCreateRequest;
-import com.lpnu.poly.dto.users.UserProfileResponse;
-import com.lpnu.poly.dto.users.UserUpdateRequest;
+import com.lpnu.poly.DTO.users.UserCreateRequest;
+import com.lpnu.poly.DTO.users.UserProfileResponse;
+import com.lpnu.poly.DTO.users.UserUpdateRequest;
 import com.lpnu.poly.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +29,11 @@ public class UserController {
 
 
         @PutMapping(value = "/v1/{id}")
-        public ResponseEntity<UserUpdateRequest> updateUser(@PathVariable("id") Long id,
+        public ResponseEntity<UserUpdateRequest> updateUser(@PathVariable("id")
                                                             @Valid
                                                     @RequestBody
                                                                     UserUpdateRequest userUpdateRequest){
-            return userService.updateUser(id, userUpdateRequest);
+            return userService.updateUser(userUpdateRequest);
         }
 
         @DeleteMapping(value = "/v1/{id}")
@@ -41,13 +41,8 @@ public class UserController {
             return userService.deleteUser(id);
         }
 
-        @GetMapping(value = "/v1/allUsers")
-        public ResponseEntity<List<UserProfileResponse>> getAllUsers(){
-            return userService.getAllUsers();
-        }
-
         @GetMapping(value = "/v1/{id}")
-        public ResponseEntity<UserProfileResponse> findUser(@PathVariable("id")Long id){
-            return userService.findUser(id);
+        public ResponseEntity<UserProfileResponse> getUser(@PathVariable("id")Long id){
+            return userService.getUser(id);
         }
 }

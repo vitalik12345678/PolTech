@@ -1,5 +1,6 @@
 package com.lpnu.poly.entity;
 
+import com.lpnu.poly.entity.mapper.Convertable;
 import com.lpnu.poly.type.PostgresSQLEnumType;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ import org.hibernate.annotations.TypeDef;
 @Entity
 @Table(name = "users")
 @TypeDef(name = "pgsql_enum", typeClass = PostgresSQLEnumType.class)
-public class User {
+public class User implements Convertable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
