@@ -6,17 +6,15 @@ import com.lpnu.poly.DTO.users.UserUpdateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public interface UserService {
 
-    ResponseEntity<UserProfileResponse> getUser(Long id);
+    ResponseEntity<UserProfileResponse> getUser(String id);
 
     ResponseEntity<UserProfileResponse> deleteUser(Long id);
 
-    ResponseEntity<UserUpdateRequest> updateUser(UserUpdateRequest userUpdateProfile);
+    ResponseEntity<UserProfileResponse> updateUser(UserUpdateRequest userUpdateProfile);
 
-    ResponseEntity<UserCreateRequest> createUser(UserCreateRequest playerCreateProfile);
+    ResponseEntity<UserProfileResponse> createUser(UserCreateRequest playerCreateProfile);
 
 }

@@ -5,10 +5,9 @@ import com.lpnu.poly.DTO.users.UserProfileResponse;
 import com.lpnu.poly.DTO.users.UserUpdateRequest;
 import com.lpnu.poly.entity.*;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
+import com.lpnu.poly.exception.ExistsException;
 import com.lpnu.poly.exception.NotExistsException;
-import com.lpnu.poly.repository.BranchRepository;
-import com.lpnu.poly.repository.HobbyRepository;
-import com.lpnu.poly.repository.UserRepository;
+import com.lpnu.poly.repository.*;
 import com.lpnu.poly.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -32,24 +28,28 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DTOConvertor dtoConvertor;
     private final HobbyRepository hobbyRepository;
-    private final String USER_IS_NOT_EXIST = "User not exist";
-    private final String USER_IS_NOT_FOUND = "User wasn't found";
+    private final UserBranchRepository userBranchRepository;
+    private final UserHobbyRepository userHobbyRepository;
+    private static final String USER_IS_NOT_EXIST = "User not exist";
     private static final String BRANCH_NOT_EXIST = "Branch doesn't exist";
     private static final String HOBBY_NOT_EXIST = "Hobby doesn't exist";
+    private static final String USER_EXIST = "User exist";
 
 
     @Autowired
-    public UserServiceImpl(BranchRepository branchRepository, UserRepository usersRepository, DTOConvertor dtoConvertor, HobbyRepository hobbyRepository) {
+    public UserServiceImpl(BranchRepository branchRepository, UserRepository usersRepository, DTOConvertor dtoConvertor, HobbyRepository hobbyRepository, UserBranchRepository userBranchRepository, UserHobbyRepository userHobbyRepository) {
         this.branchRepository = branchRepository;
         this.userRepository = usersRepository;
         this.dtoConvertor = dtoConvertor;
         this.hobbyRepository = hobbyRepository;
+        this.userBranchRepository = userBranchRepository;
+        this.userHobbyRepository = userHobbyRepository;
     }
 
 
     @Override
-    public ResponseEntity<UserProfileResponse> getUser(Long id) {
-        User user = findUser(id);
+    public ResponseEntity<UserProfileResponse> getUser(String email) {
+        User user = findUser(email);
         UserProfileResponse userProfileResponse = dtoConvertor.convertToDTO(user, new UserProfileResponse());
         return ResponseEntity.ok(userProfileResponse);
     }
@@ -63,35 +63,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserUpdateRequest> updateUser(UserUpdateRequest userUpdateRequest) {
-        User user = findUserAllUp(userUpdateRequest.getGraduationYear(), userUpdateRequest.getBranch(), userUpdateRequest.getGraduate(), userUpdateRequest.getWork(), userUpdateRequest.getHobby(), userUpdateRequest.getFirstName(), userUpdateRequest.getLastName(), userUpdateRequest.getMiddleName());
-        user.setUserBranches(getUserBranchesFromClient(user, Collections.singletonList(userUpdateRequest.getBranch())));
-        user.setUserHobbies(getUserHobbyFromClient(user, Collections.singletonList(userUpdateRequest.getHobby())));
-        userRepository.save(user);
-        return ResponseEntity.ok(new UserUpdateRequest(userUpdateRequest.getGraduationYear(), userUpdateRequest.getBranch(), userUpdateRequest.getGraduate(), userUpdateRequest.getWork(), userUpdateRequest.getHobby(), userUpdateRequest.getFirstName(), userUpdateRequest.getLastName(), userUpdateRequest.getMiddleName()));
+    public ResponseEntity<UserProfileResponse> updateUser(UserUpdateRequest userUpdateRequest) {
+        User user = findUser(userUpdateRequest.getEmail());
+
+        user.setUserBranches(getUserBranchesFromClient(user, userUpdateRequest.getBranch()));
+        user.setUserHobbies(getUserHobbyFromClient(user, userUpdateRequest.getHobby()));
+
+       userHobbyRepository.deleteAll(userHobbyRepository.findByUser(user));
+       userBranchRepository.deleteAll(userBranchRepository.findByUser(user));
+
+       userBranchRepository.saveAll(getUserBranchesFromClient(user,userUpdateRequest.getBranch()));
+       userHobbyRepository.saveAll(getUserHobbyFromClient(user,userUpdateRequest.getHobby()));
+
+       userRepository.save(user);
+
+        return ResponseEntity.ok(dtoConvertor.convertToDTO(user,new UserProfileResponse()));
     }
 
-    //
     @Override
-    public ResponseEntity<UserCreateRequest> createUser(UserCreateRequest userCreateRequest) {
+    public ResponseEntity<UserProfileResponse> createUser(UserCreateRequest userCreateRequest) {
 
-        User users = findUserAllCreate(userCreateRequest.getEmail(), userCreateRequest.getPassword(), userCreateRequest.getGraduationYear(), userCreateRequest.getBranch(), userCreateRequest.getGraduate(), userCreateRequest.getWork(), userCreateRequest.getHobby(), userCreateRequest.getFirstName(), userCreateRequest.getLastName(), userCreateRequest.getMiddleName());
-//        User user = new User();
+        Optional<User> optionalUser = userRepository.findByEmail(userCreateRequest.getEmail());
 
-        users.setUserBranches(getUserBranchesFromClient(users, userCreateRequest.getBranch()));
-        users.setUserHobbies(getUserHobbyFromClient(users, Collections.singletonList(userCreateRequest.getHobby())));
-        users.setLastName(userCreateRequest.getLastName());
-        users.setFirstName(userCreateRequest.getFirstName());
-        users.setMiddleName(userCreateRequest.getMiddleName());
-        users.setWork(userCreateRequest.getWork());
-        users.setEmail(userCreateRequest.getEmail());
-        users.setPassword(userCreateRequest.getPassword());
-        users.setGraduationYear(userCreateRequest.getGraduationYear());
-        users.setGraduate(Graduate.викладач);
-        userRepository.save(users);
-        return ResponseEntity.ok(new UserCreateRequest(userCreateRequest.getEmail(), userCreateRequest.getPassword(), userCreateRequest.getGraduationYear(), userCreateRequest.getBranch(), userCreateRequest.getGraduate(), userCreateRequest.getWork(), userCreateRequest.getHobby(), userCreateRequest.getFirstName(), userCreateRequest.getLastName(), userCreateRequest.getMiddleName()));
+        if (optionalUser.isPresent()){
+            throw new ExistsException(USER_EXIST);
+        }
 
+        User user = dtoConvertor.convertToEntity(userCreateRequest,new User());
+        user.setUserBranches(getUserBranchesFromClient(user,userCreateRequest.getBranch()));
+        user.setUserHobbies(getUserHobbyFromClient(user,userCreateRequest.getHobby()));
+        userRepository.save(user);
+        userHobbyRepository.saveAll(getUserHobbyFromClient(user,userCreateRequest.getHobby()));
+        userBranchRepository.saveAll(getUserBranchesFromClient(user,userCreateRequest.getBranch()));
+        return ResponseEntity.ok(dtoConvertor.convertToDTO(user,new UserProfileResponse()));
     }
+
     private List<UserHobby> getUserHobbyFromClient(User user, List<String> hobby) {
         List<UserHobby> postHobbies = new ArrayList<>();
 
@@ -126,27 +132,12 @@ public class UserServiceImpl implements UserService {
         });
     }
 
-    private User findUserAllUp(
-            Integer graduationYear, String graduate, String work, String hobby,
-            @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String firstName,
-            @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String lastName,
-            @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String middleName, @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String name) {
-        return userRepository.findByAllUp(graduationYear, graduate, work, hobby, firstName, middleName, lastName).orElseThrow(() -> {
-            throw new NotExistsException(USER_IS_NOT_FOUND);
+    private User findUser(String email){
+        return userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotExistsException(USER_IS_NOT_EXIST);
         });
     }
 
-    private User findUserAllCreate(
-            @NotBlank @Email String email,
-            @NotBlank @Pattern(regexp = "^[A-Za-z1-9]{12,18}$") String password,
-            Integer graduationYear, @NotBlank List<String> graduate, String work, String hobby,
-            @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String firstName,
-            @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String lastName,
-            @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String middleName, @NotBlank @Pattern(regexp = "^[А-Яа-я]*$") String name) {
-        return userRepository.findByAllCreate(email, password, graduationYear, graduate, work, hobby, firstName, middleName, lastName).orElseThrow(() -> {
-            throw new NotExistsException(USER_IS_NOT_FOUND);
-        });
-    }
     private Branch findBranch(String name) {
         return branchRepository.findByName(name).orElseThrow(() -> {
             throw new NotExistsException(BRANCH_NOT_EXIST);

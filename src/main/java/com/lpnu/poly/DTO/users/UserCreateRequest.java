@@ -1,4 +1,4 @@
-package com.lpnu.poly.dto.users;
+package com.lpnu.poly.DTO.users;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +31,7 @@ public class UserCreateRequest {
     private String work;
 
     @NotBlank
-    private String hobby;
+    private List<String> hobby;
 
     @NotBlank
     @Pattern(regexp = "^[А-Яа-я]*$")

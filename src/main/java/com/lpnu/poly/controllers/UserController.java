@@ -23,14 +23,14 @@ public class UserController {
         }
 
         @PostMapping(value = "/v1/")
-        public ResponseEntity<UserCreateRequest> createUser(@RequestBody UserCreateRequest userCreateRequest){
+        public ResponseEntity<UserProfileResponse> createUser(@RequestBody UserCreateRequest userCreateRequest){
             return userService.createUser(userCreateRequest);
         }
 
 
-        @PutMapping(value = "/v1/{id}")
-        public ResponseEntity<UserUpdateRequest> updateUser(@PathVariable("id")
-                                                            @Valid
+        @PutMapping(value = "/v1/")
+        public ResponseEntity<UserProfileResponse> updateUser(
+                                                         //   @Valid
                                                     @RequestBody
                                                                     UserUpdateRequest userUpdateRequest){
             return userService.updateUser(userUpdateRequest);
@@ -41,8 +41,8 @@ public class UserController {
             return userService.deleteUser(id);
         }
 
-        @GetMapping(value = "/v1/{id}")
-        public ResponseEntity<UserProfileResponse> getUser(@PathVariable("id")Long id){
-            return userService.getUser(id);
+        @GetMapping(value = "/v1/{email}")
+        public ResponseEntity<UserProfileResponse> getUser(@PathVariable("email")String email){
+            return userService.getUser(email);
         }
 }

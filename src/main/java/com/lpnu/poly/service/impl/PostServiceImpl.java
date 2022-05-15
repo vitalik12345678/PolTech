@@ -6,10 +6,7 @@ import com.lpnu.poly.DTO.post.PostUpdateRequest;
 import com.lpnu.poly.entity.*;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
 import com.lpnu.poly.exception.NotExistsException;
-import com.lpnu.poly.repository.BranchRepository;
-import com.lpnu.poly.repository.HobbyRepository;
-import com.lpnu.poly.repository.PostRepository;
-import com.lpnu.poly.repository.UserRepository;
+import com.lpnu.poly.repository.*;
 import com.lpnu.poly.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +29,18 @@ public class PostServiceImpl implements PostService {
     private static final String HOBBY_NOT_EXIST = "Hobby doesn't exist";
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PostHobbyRepository postHobbyRepository;
+    private final PostBranchRepository postBranchRepository;
     private final DTOConvertor dtoConvertor;
     private final BranchRepository branchRepository;
     private final HobbyRepository hobbyRepository;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, DTOConvertor dtoConvertor, BranchRepository branchRepository, HobbyRepository hobbyRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostHobbyRepository postHobbyRepository, PostBranchRepository postBranchRepository, DTOConvertor dtoConvertor, BranchRepository branchRepository, HobbyRepository hobbyRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.postHobbyRepository = postHobbyRepository;
+        this.postBranchRepository = postBranchRepository;
         this.dtoConvertor = dtoConvertor;
         this.branchRepository = branchRepository;
         this.hobbyRepository = hobbyRepository;
@@ -63,6 +64,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public ResponseEntity<PostProfileResponse> createPost(PostCreateRequest postCreateRequest) {
         User user = findUser(postCreateRequest.getEmail());
+
         Post post = new Post();
         post.setUser(user);
         post.setPostHobbies(getPostHobbyFromClient(post, postCreateRequest.getHobby()));
@@ -70,6 +72,8 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postCreateRequest.getTitle());
         post.setPublishedDate(LocalDateTime.now());
 
+        postBranchRepository.saveAll(getPostBranchesFromClient(post,postCreateRequest.getBranch()));
+        postHobbyRepository.saveAll(getPostHobbyFromClient(post,postCreateRequest.getHobby()));
         postRepository.save(post);
 
 
@@ -83,6 +87,12 @@ public class PostServiceImpl implements PostService {
 
         post.setPostBranches(getPostBranchesFromClient(post, postUpdateRequest.getBranch()));
         post.setPostHobbies(getPostHobbyFromClient(post, postUpdateRequest.getHobby()));
+
+        postHobbyRepository.deleteAll(postHobbyRepository.findByPost(post));
+        postBranchRepository.deleteAll(postBranchRepository.findByPost(post));
+
+        postHobbyRepository.saveAll(getPostHobbyFromClient(post,postUpdateRequest.getHobby()));
+        postBranchRepository.saveAll(getPostBranchesFromClient(post,postUpdateRequest.getBranch()));
 
         postRepository.save(post);
         return ResponseEntity.ok(new PostProfileResponse(postUpdateRequest.getTitle()));

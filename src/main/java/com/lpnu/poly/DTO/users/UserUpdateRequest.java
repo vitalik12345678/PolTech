@@ -1,24 +1,36 @@
-package com.lpnu.poly.dto.users;
+package com.lpnu.poly.DTO.users;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
+
+@Getter
+@Setter
 public class UserUpdateRequest {
+
+
+    @Email
+    private String email;
 
     @NotEmpty
     @Min(1960)
     @Max(2300)
     private Integer graduationYear;
 
-    @NotBlank
-    private String branch;
+    @NotNull
+    private List<String> branch;
 
     @NotBlank
     private String graduate;
 
-    private String work;
-
     @NotBlank
-    private String hobby;
+    private String  work;
+
+    @NotNull
+    private List<String> hobby;
 
     @NotBlank
     @Pattern(regexp = "^[А-Яа-я]*$")

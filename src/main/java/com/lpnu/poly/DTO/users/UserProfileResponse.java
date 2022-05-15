@@ -1,19 +1,18 @@
-package com.lpnu.poly.dto.users;
+package com.lpnu.poly.DTO.users;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class UserProfileResponse {
 
         private Integer graduationYear;
 
-//    private String branch;
-
-//    private String graduate;
+        private String graduate;
 
         private String work;
-
-//    private String hobby;
 
         private String firstName;
 
