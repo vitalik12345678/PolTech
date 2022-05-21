@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(userProfileResponse);
     }
 
-    @Override
+        @Override
     public ResponseEntity<UserProfileResponse> updateUser(UserUpdateRequest userUpdateRequest) {
         User user = findUser(userUpdateRequest.getEmail());
 
@@ -79,6 +79,7 @@ public class UserServiceImpl implements UserService {
 
         return ResponseEntity.ok(dtoConvertor.convertToDTO(user,new UserProfileResponse()));
     }
+
 
     @Override
     public ResponseEntity<UserProfileResponse> createUser(UserCreateRequest userCreateRequest) {
