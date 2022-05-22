@@ -12,7 +12,6 @@ import java.util.List;
 public class JWTResponse {
 
     private String jwt;
-    private Long id;
-    private String email;
     private List<String> roles;
+
 }
