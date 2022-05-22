@@ -1,6 +1,7 @@
 package com.lpnu.poly.security;
 
 import com.lpnu.poly.entity.User;
+import com.lpnu.poly.exception.ExistsException;
 import com.lpnu.poly.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
        User user = userRepository.findByEmail(username).orElseThrow( () -> {
-            throw new UsernameNotFoundException(USER_DONT_FIND +username);
+            throw new ExistsException(USER_DONT_FIND +username);
         });
         return UserDetailsImpl.build(user);
     }
