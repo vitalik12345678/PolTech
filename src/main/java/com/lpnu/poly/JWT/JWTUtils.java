@@ -23,6 +23,7 @@ public class JWTUtils {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
+                .setId(String.valueOf(userPrincipal.getId()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -31,6 +32,10 @@ public class JWTUtils {
 
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public Long getIdFromJwtToken(String token) {
+        return Long.valueOf( Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getId() );
     }
 
     public boolean validateJwtToken(String authToken) {
