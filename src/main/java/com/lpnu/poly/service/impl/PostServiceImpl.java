@@ -5,18 +5,24 @@ import com.lpnu.poly.DTO.post.PostProfileResponse;
 import com.lpnu.poly.DTO.post.PostUpdateRequest;
 import com.lpnu.poly.entity.*;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
+import com.lpnu.poly.exception.ExistsException;
 import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
 import com.lpnu.poly.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,6 +33,7 @@ public class PostServiceImpl implements PostService {
     private static final String POST_NOT_EXIST = "Post doesn't exist";
     private static final String BRANCH_NOT_EXIST = "Branch doesn't exist";
     private static final String HOBBY_NOT_EXIST = "Hobby doesn't exist";
+    private static final String POST_EXIST = "Post exist";
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostHobbyRepository postHobbyRepository;
@@ -63,7 +70,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResponseEntity<PostProfileResponse> createPost(PostCreateRequest postCreateRequest) {
-        User user = findUser(postCreateRequest.getEmail());
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<Post> optionalPost = postRepository.findByTitle(postCreateRequest.getTitle());
+        if (optionalPost.isPresent()){
+            throw new ExistsException(POST_EXIST);
+        }
+
+        User user = findUser(userDetails.getUsername());
 
         Post post = new Post();
         post.setUser(user);
@@ -72,12 +87,13 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postCreateRequest.getTitle());
         post.setPublishedDate(LocalDateTime.now());
 
+        postRepository.save(post);
         postBranchRepository.saveAll(getPostBranchesFromClient(post,postCreateRequest.getBranch()));
         postHobbyRepository.saveAll(getPostHobbyFromClient(post,postCreateRequest.getHobby()));
-        postRepository.save(post);
 
+        PostProfileResponse postProfileResponse = dtoConvertor.convertToDTO(post,new PostProfileResponse());
 
-        return ResponseEntity.ok(new PostProfileResponse(post.getTitle()));
+        return ResponseEntity.ok(postProfileResponse);
     }
 
     @Override
@@ -95,7 +111,17 @@ public class PostServiceImpl implements PostService {
         postBranchRepository.saveAll(getPostBranchesFromClient(post,postUpdateRequest.getBranch()));
 
         postRepository.save(post);
-        return ResponseEntity.ok(new PostProfileResponse(postUpdateRequest.getTitle()));
+        return ResponseEntity.ok(dtoConvertor.convertToDTO(post,new PostProfileResponse()));
+    }
+
+    @Override
+    public ResponseEntity<List<PostProfileResponse>> getAllPost() {
+
+        List<Post> posts = postRepository.findAll();
+
+        List<PostProfileResponse> response = posts.stream().map( element -> dtoConvertor.convertToDTO(element,new PostProfileResponse())).collect(Collectors.toList());
+
+        return ResponseEntity.ok( response );
     }
 
     private List<PostHobby> getPostHobbyFromClient(Post post, List<String> hobby) {

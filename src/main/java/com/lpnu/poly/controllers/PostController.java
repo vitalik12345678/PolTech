@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/post/")
@@ -24,6 +25,11 @@ public class PostController {
     @GetMapping("v1/{id}")
     public ResponseEntity<PostProfileResponse> getPost(@PathVariable("id")Long id ){
         return postService.getPost(id);
+    }
+
+    @GetMapping("v1/allPost")
+    public ResponseEntity<List<PostProfileResponse>> getAllPost(){
+        return postService.getAllPost();
     }
 
     @PostMapping("v1")

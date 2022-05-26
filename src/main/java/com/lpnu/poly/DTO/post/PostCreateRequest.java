@@ -10,9 +10,8 @@ import java.util.List;
 @Setter
 public class PostCreateRequest {
 
-    @Email
-    private String email;
     private String title;
+    private String photoURI;
     private List<String> branch;
     private List<String> hobby;
 
