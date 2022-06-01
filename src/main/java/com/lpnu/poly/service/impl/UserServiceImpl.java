@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -118,6 +119,7 @@ public class UserServiceImpl implements UserService {
         user.setUserBranches(getUserBranchesFromClient(user, userCreateRequest.getBranch()));
         user.setUserHobbies(getUserHobbyFromClient(user, userCreateRequest.getHobby()));
         user.setPassword(encoder.encode(userCreateRequest.getPassword()));
+        user.setGraduate(Graduate.valueOf(userCreateRequest.getGraduate().toLowerCase(Locale.ROOT)));
         user.setRole(roleRepository.findByName(ROLE_USER).orElseThrow(() -> {
             throw new NotExistsException(ROLE_NOT_EXIST);
         }));

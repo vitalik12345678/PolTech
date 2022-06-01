@@ -11,6 +11,10 @@ import com.lpnu.poly.repository.*;
 import com.lpnu.poly.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -122,6 +124,42 @@ public class PostServiceImpl implements PostService {
         List<PostProfileResponse> response = posts.stream().map( element -> dtoConvertor.convertToDTO(element,new PostProfileResponse())).collect(Collectors.toList());
 
         return ResponseEntity.ok( response );
+    }
+
+    @Override
+    public ResponseEntity<List<PostProfileResponse>> getFilteredPost(String title, String days, List<String> branches, List<String> hobby, String fromPage, String pageCount) {
+
+        LocalDateTime  date = LocalDateTime.parse(days);
+
+        Set<Post> resultPosts ;
+
+        System.out.println();
+
+        List<Branch> branchList = branches.stream().map( element -> {
+            return branchRepository.findByName(element).get();
+        }).collect(Collectors.toList());
+
+        Set<PostBranch> postBranches = postBranchRepository.findDistinctByBranchIn(branchList);
+
+        Set<Hobby> hobbies = hobby.stream().map( element -> {
+            return hobbyRepository.findByName(element).get();
+        }).collect(Collectors.toSet ());
+
+        Set<PostHobby> postHobbies = postHobbyRepository.findDistinctByHobbyIn(hobbies);
+
+        resultPosts = postRepository.findByTitleIsContainingAndPublishedDateGreaterThanAndPostBranchesInAndPostHobbiesIn(title,date,postBranches,postHobbies);
+
+        resultPosts.forEach( x -> {
+            System.out.println(x.getId());
+        });
+
+        List<PostProfileResponse> responses = new ArrayList<>();
+
+        resultPosts.forEach( x -> {
+            responses.add(dtoConvertor.convertToDTO(x,new PostProfileResponse()));
+        });
+
+        return  ResponseEntity.ok(responses);
     }
 
     private List<PostHobby> getPostHobbyFromClient(Post post, List<String> hobby) {
