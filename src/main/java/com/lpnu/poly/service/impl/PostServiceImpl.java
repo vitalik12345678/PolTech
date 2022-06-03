@@ -10,8 +10,10 @@ import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
 import com.lpnu.poly.service.PostService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -131,10 +133,6 @@ public class PostServiceImpl implements PostService {
 
         LocalDateTime  date = LocalDateTime.parse(days);
 
-        Set<Post> resultPosts ;
-
-        System.out.println();
-
         List<Branch> branchList = branches.stream().map( element -> {
             return branchRepository.findByName(element).get();
         }).collect(Collectors.toList());
@@ -147,15 +145,13 @@ public class PostServiceImpl implements PostService {
 
         Set<PostHobby> postHobbies = postHobbyRepository.findDistinctByHobbyIn(hobbies);
 
-        resultPosts = postRepository.findByTitleIsContainingAndPublishedDateGreaterThanAndPostBranchesInAndPostHobbiesIn(title,date,postBranches,postHobbies);
+        Pageable pageable = PageRequest.of(Integer.parseInt(fromPage),Integer.parseInt(pageCount),Sort.by("publishedDate").descending());
 
-        resultPosts.forEach( x -> {
-            System.out.println(x.getId());
-        });
+        Page<Post> resultPosts = postRepository.findByTitleContainingIgnoreCaseAndPublishedDateGreaterThanAndPostBranchesInAndPostHobbiesIn(title,date,postBranches,postHobbies,pageable);
 
         List<PostProfileResponse> responses = new ArrayList<>();
 
-        resultPosts.forEach( x -> {
+        resultPosts.getContent().forEach( x -> {
             responses.add(dtoConvertor.convertToDTO(x,new PostProfileResponse()));
         });
 

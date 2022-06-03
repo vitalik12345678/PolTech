@@ -39,7 +39,7 @@ public class PostController {
                                                                      @RequestParam(value = "days",required = false) String days,
                                                                      @RequestParam(value = "hobby",required = false) List<String> hobby,
                                                                      @RequestParam(value = "branch",required = false) List<String> branch,
-                                                                     @RequestParam(value = "from",required = false) String fromPage,
+                                                                     @RequestParam(value = "fromPage",required = false) String fromPage,
                                                                      @RequestParam(value = "pageCount",required = false) String pageCount) {
         return postService.getFilteredPost(title,days,branch,hobby,fromPage,pageCount);
     }
