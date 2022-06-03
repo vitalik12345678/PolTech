@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,28 +25,37 @@ public class PostController {
     }
 
     @GetMapping("v1/{id}")
-    public ResponseEntity<PostProfileResponse> getPost(@PathVariable("id")Long id ){
+    public ResponseEntity<PostProfileResponse> getPost(@PathVariable("id") Long id) {
         return postService.getPost(id);
     }
 
     @GetMapping("v1/allPost")
-    public ResponseEntity<List<PostProfileResponse>> getAllPost(){
+    public ResponseEntity<List<PostProfileResponse>> getAllPost() {
         return postService.getAllPost();
     }
 
+    @GetMapping("v1/filter")
+    public ResponseEntity<List<PostProfileResponse>> getFilteredPost(@RequestParam(value = "title",required = false) String title,
+                                                                     @RequestParam(value = "days",required = false) String days,
+                                                                     @RequestParam(value = "hobby",required = false) List<String> hobby,
+                                                                     @RequestParam(value = "branch",required = false) List<String> branch,
+                                                                     @RequestParam(value = "fromPage",required = false) String fromPage,
+                                                                     @RequestParam(value = "pageCount",required = false) String pageCount) {
+        return postService.getFilteredPost(title,days,branch,hobby,fromPage,pageCount);
+    }
+
     @PostMapping("v1")
-    public ResponseEntity<PostProfileResponse> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest){
+    public ResponseEntity<PostProfileResponse> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest) {
         return postService.createPost(postCreateRequest);
     }
 
     @DeleteMapping("v1/{id}")
-    public ResponseEntity<PostProfileResponse> deletePost(@PathVariable("id")Long id){
+    public ResponseEntity<PostProfileResponse> deletePost(@PathVariable("id") Long id) {
         return postService.deletePost(id);
     }
 
     @PutMapping("v1/{id}")
-    public ResponseEntity<PostProfileResponse> updatePost(@PathVariable("id")Long id,
-                                                          @RequestBody PostUpdateRequest postUpdateRequest){
+    public ResponseEntity<PostProfileResponse> updatePost(@PathVariable("id") Long id, @RequestBody PostUpdateRequest postUpdateRequest) {
         return postService.updatePost(postUpdateRequest);
     }
 
