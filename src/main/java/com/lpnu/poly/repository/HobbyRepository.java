@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface HobbyRepository extends JpaRepository<Hobby,Long> {
@@ -16,6 +15,6 @@ public interface HobbyRepository extends JpaRepository<Hobby,Long> {
 
     Optional<Hobby> findByName(String name);
 
-
+    List<Hobby> findAll();
 
 }

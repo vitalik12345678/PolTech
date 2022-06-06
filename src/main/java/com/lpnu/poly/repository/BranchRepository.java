@@ -1,7 +1,6 @@
 package com.lpnu.poly.repository;
 
 import com.lpnu.poly.entity.Branch;
-import com.lpnu.poly.entity.Hobby;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +15,6 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
 
     Optional<Branch> findByName (String name);
 
+    @Override
+    List<Branch> findAll();
 }
