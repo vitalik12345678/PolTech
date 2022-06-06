@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class PostProfileResponse implements Convertable {
 
     private String title;
+    private String context;
     private LocalDateTime publishedDate;
     private Long userId;
     private Long fileId;

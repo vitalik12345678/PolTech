@@ -84,11 +84,10 @@ public class PostServiceImpl implements PostService {
 
         User user = findUser(userDetails.getUsername());
 
-        Post post = new Post();
+        Post post = dtoConvertor.convertToEntity(postCreateRequest,new Post());
         post.setUser(user);
         post.setPostHobbies(getPostHobbyFromClient(post, postCreateRequest.getHobby()));
         post.setPostBranches(getPostBranchesFromClient(post, postCreateRequest.getBranch()));
-        post.setTitle(postCreateRequest.getTitle());
         post.setPublishedDate(LocalDateTime.now());
 
         postRepository.save(post);
