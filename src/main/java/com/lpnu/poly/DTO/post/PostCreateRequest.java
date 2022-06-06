@@ -16,6 +16,8 @@ public class PostCreateRequest {
     private String title;
     @NotBlank
     private String photoURI;
+    @NotBlank
+    private String context;
     @NotEmpty(message = "Post branch/branches are empty")
     private List<String> branch;
     @NotEmpty(message = "Post hobby/hobbies are empty")
