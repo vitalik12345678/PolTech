@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 @Getter
 public class UserCreateRequest {
+
     @NotBlank
     @Email
     private String email;
@@ -45,17 +46,4 @@ public class UserCreateRequest {
     @Pattern(regexp = "^[А-Яа-я]*$")
     private String middleName;
 
-    public UserCreateRequest(String email, String password, Integer graduationYear, List<String> branch, String graduate, String work, String hobby, String firstName, String lastName, String middleName) {
-    }
 }
-//{
-/*
-        "email":"dsfsfsdf7@gmail.com",
-        "password":"123asdasdasdg",
-        "graduationYear":"2000",
-        "work":"Lector",
-        "firstName" : "test",
-        "lastName" : "test",
-        "middleName" : "test"
-*/
-//}

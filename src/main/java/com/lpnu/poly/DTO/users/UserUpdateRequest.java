@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 public class UserUpdateRequest {
 
-
     @Email
     private String email;
 
@@ -26,7 +25,6 @@ public class UserUpdateRequest {
     @NotBlank
     private String graduate;
 
-    @NotBlank
     private String  work;
 
     @NotNull
@@ -44,6 +42,4 @@ public class UserUpdateRequest {
     @Pattern(regexp = "^[А-Яа-я]*$")
     private String middleName;
 
-    public UserUpdateRequest(Integer graduationYear, String branch, String graduate, String work, String hobby, String firstName, String lastName, String middleName) {
-    }
 }
