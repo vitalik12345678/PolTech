@@ -29,6 +29,9 @@ public class Post implements Convertable {
     @Column(name = "title", nullable = false, length = 60)
     private String title;
 
+    @Column(name = "context")
+    private String context;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "files_id")
     private File files;

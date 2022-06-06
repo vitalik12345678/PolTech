@@ -2,17 +2,23 @@ package com.lpnu.poly.DTO.post;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Email;
+import javax.validation.constraints.*;
 import java.util.List;
 
 @Getter
 @Setter
 public class PostCreateRequest {
 
+    @NotBlank
+    @Length(max = 80,message = "Post title had more than 80 symbols")
     private String title;
+    @NotBlank
     private String photoURI;
+    @NotEmpty(message = "Post branch/branches are empty")
     private List<String> branch;
+    @NotEmpty(message = "Post hobby/hobbies are empty")
     private List<String> hobby;
 
 }
