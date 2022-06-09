@@ -1,17 +1,17 @@
 package com.lpnu.poly.entity;
 
+import com.lpnu.poly.entity.mapper.Convertable;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "message")
-public class Message {
+public class Message implements Convertable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

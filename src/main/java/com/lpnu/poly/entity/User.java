@@ -1,15 +1,15 @@
 package com.lpnu.poly.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.lpnu.poly.entity.mapper.Convertable;
 import com.lpnu.poly.type.PostgresSQLEnumType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.List;
-import org.hibernate.annotations.TypeDef;
-
 
 
 @Getter
@@ -70,6 +70,7 @@ public class User implements Convertable {
     private List<PartyUser> partyUsers;
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference
     private List<Post> posts;
 
     @OneToMany(mappedBy = "firstUser")
@@ -85,6 +86,7 @@ public class User implements Convertable {
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference
     private List<Message> messages;
 
     @OneToMany(mappedBy = "user")
