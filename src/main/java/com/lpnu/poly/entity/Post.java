@@ -1,11 +1,11 @@
 package com.lpnu.poly.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.lpnu.poly.entity.mapper.Convertable;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,6 +21,7 @@ public class Post implements Convertable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @Column(name = "published_date", nullable = false)
@@ -49,6 +50,7 @@ public class Post implements Convertable {
     private List<PostLike> postLikes;
 
     @OneToMany(mappedBy = "post")
+    @JsonBackReference
     private List<Comment> comments;
 
 }
