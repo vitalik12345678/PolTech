@@ -3,9 +3,8 @@ package com.lpnu.poly.controllers;
 import com.lpnu.poly.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/file")
@@ -18,11 +17,15 @@ public class FileController {
         this.fileService = fileService;
     }
 
-
     @GetMapping("/v1/")
-    public ResponseEntity<?> file(){
+    public ResponseEntity<String> getFile(@RequestParam("title")String title){
+        return fileService.getFile(title);
+    }
 
-        return fileService.uploadFile();
+    @PostMapping("/v1/")
+    public ResponseEntity<String> file(@RequestParam("file")MultipartFile file,
+                                  @RequestParam("title")String title){
+        return fileService.uploadFile(file,title);
     }
 
 }

@@ -38,7 +38,6 @@ public class AppConfig {
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .withRegion(Regions.EU_CENTRAL_1)
                 .build();
-
     }
 
 }

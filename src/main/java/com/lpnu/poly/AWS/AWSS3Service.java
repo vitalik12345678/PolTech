@@ -1,8 +1,12 @@
 package com.lpnu.poly.AWS;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.CopyObjectResult;
@@ -24,6 +28,17 @@ public class AWSS3Service {
         this.s3client = s3client;
     }
 
+
+    public URL getURI(String bucketName, String key){
+        return s3client.getUrl(bucketName, key);
+    }
+
+    public String generateURI(String bucketName, String key, HttpMethod httpMethod){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, 1);
+        return s3client.generatePresignedUrl(bucketName,key,calendar.getTime(),httpMethod).toString();
+    }
 
     //is bucket exist?
     public boolean doesBucketExist(String bucketName) {

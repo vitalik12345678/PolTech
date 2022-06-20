@@ -15,8 +15,6 @@ public class PostCreateRequest {
     @Length(max = 80,message = "Post title had more than 80 symbols")
     private String title;
     @NotBlank
-    private String photoURI;
-    @NotBlank
     private String context;
     @NotEmpty(message = "Post branch/branches are empty")
     private List<String> branch;

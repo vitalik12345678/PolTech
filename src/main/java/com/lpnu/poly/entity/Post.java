@@ -33,6 +33,9 @@ public class Post implements Convertable {
     @Column(name = "context")
     private String context;
 
+    @Column(name = "avatar_uri")
+    private String avatarURI;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "files_id")
     private File files;
