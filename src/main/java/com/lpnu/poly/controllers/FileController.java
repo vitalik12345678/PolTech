@@ -17,15 +17,25 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @GetMapping("/v1/")
-    public ResponseEntity<String> getFile(@RequestParam("title")String title){
-        return fileService.getFile(title);
+    @GetMapping("/v1/post/")
+    public ResponseEntity<String> getPostAvatar(@RequestParam("title")String title){
+        return fileService.getPostFile(title);
+    }
+    @GetMapping("/v1/user/")
+    public ResponseEntity<String> getUserAvatar(@RequestParam("email")String email){
+        return fileService.getUserFile(email);
     }
 
-    @PostMapping("/v1/")
-    public ResponseEntity<String> file(@RequestParam("file")MultipartFile file,
+    @PostMapping("/v1/post/")
+    public ResponseEntity<String> uploadPostAvatar(@RequestParam("file")MultipartFile file,
                                   @RequestParam("title")String title){
-        return fileService.uploadFile(file,title);
+        return fileService.uploadPostFile(file,title);
+    }
+
+    @PostMapping("/v1/user/")
+    public ResponseEntity<String> uploadUserAvatar(@RequestParam("file")MultipartFile file,
+                                  @RequestParam("email")String email){
+        return fileService.uploadUserFile(file,email);
     }
 
 }

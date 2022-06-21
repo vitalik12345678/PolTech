@@ -4,9 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+
 
 @Getter
 @Setter
@@ -35,9 +33,5 @@ public class File {
     @Column(name = "uri")
     private String uri;
 
-    @OneToMany(mappedBy = "files")
-    private List<Post> posts;
 
-    @OneToMany(mappedBy = "avatar")
-    private List<User> users;
 }

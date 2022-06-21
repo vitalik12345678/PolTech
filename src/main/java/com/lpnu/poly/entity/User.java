@@ -49,9 +49,8 @@ public class User implements Convertable {
 
     private Graduate graduate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "avatar")
-    private File avatar;
+    @Column(name = "avatar")
+    private String avatar;
 
     @ManyToOne
     @JoinColumn(name = "role")
