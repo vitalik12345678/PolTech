@@ -4,8 +4,10 @@ import com.amazonaws.HttpMethod;
 import com.lpnu.poly.AWS.AWSS3Service;
 import com.lpnu.poly.AWS.BucketName;
 import com.lpnu.poly.entity.Post;
+import com.lpnu.poly.entity.User;
 import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.PostRepository;
+import com.lpnu.poly.repository.UserRepository;
 import com.lpnu.poly.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,23 +31,35 @@ public class FileServiceImpl implements FileService {
 
     private final AWSS3Service awss3Service;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     private static final String POST_NOT_EXIST = "Post doesn't exist";
+    private static final String USER_NOT_EXIST = "User doesn't exist";
 
     @Autowired
-    public FileServiceImpl(AWSS3Service awss3Service, PostRepository postRepository) {
+    public FileServiceImpl(AWSS3Service awss3Service, PostRepository postRepository, UserRepository userRepository) {
         this.awss3Service = awss3Service;
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public ResponseEntity<String> uploadFile(MultipartFile file, String title) {
+    public ResponseEntity<String> uploadPostFile(MultipartFile file, String title) {
         Post post = postRepository.findByTitle(title).orElseThrow(()-> {
             throw new NotExistsException(POST_NOT_EXIST);
         });
 
         String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss-"));
         String fileName = date + file.getOriginalFilename();
+
+        saveFileToAWS(file,fileName);
+        post.setAvatarURI(fileName);
+
+        return ResponseEntity.ok(fileName);
+    }
+
+    private void saveFileToAWS(MultipartFile file,String fileName) {
+
 
         try {
             Files.copy(file.getInputStream(), Path.of(fileName), StandardCopyOption.REPLACE_EXISTING);
@@ -63,15 +77,36 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        post.setAvatarURI(fileName);
-        return ResponseEntity.ok(fileName);
     }
 
     @Override
-    public ResponseEntity<String> getFile(String title) {
+    public ResponseEntity<String> getPostFile(String title) {
         Post post = postRepository.findByTitle(title).orElseThrow(()-> {
             throw new NotExistsException(POST_NOT_EXIST);
         });
         return ResponseEntity.ok(awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),post.getAvatarURI(), HttpMethod.GET));
+    }
+
+    @Override
+    public ResponseEntity<String> uploadUserFile(MultipartFile file, String email) {
+
+        User user = userRepository.findByEmail(email).orElseThrow( () -> {
+            throw new NotExistsException(USER_NOT_EXIST);
+        });
+
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss-"));
+        String fileName = date + file.getOriginalFilename();
+
+        saveFileToAWS(file,fileName);
+        user.setAvatar(fileName);
+        return ResponseEntity.ok(fileName);
+    }
+
+    @Override
+    public ResponseEntity<String> getUserFile(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow( () -> {
+            throw new NotExistsException(USER_NOT_EXIST);
+        });
+        return ResponseEntity.ok(awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),user.getAvatar(), HttpMethod.GET));
     }
 }

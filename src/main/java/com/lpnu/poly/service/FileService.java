@@ -5,7 +5,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FileService {
 
-    ResponseEntity<String> uploadFile(MultipartFile file, String title);
+    ResponseEntity<String> uploadPostFile(MultipartFile file, String title);
 
-    ResponseEntity<String> getFile(String title);
+    ResponseEntity<String> getPostFile(String title);
+
+    ResponseEntity<String> uploadUserFile(MultipartFile file,String email);
+
+    ResponseEntity<String> getUserFile(String email);
+    
 }
