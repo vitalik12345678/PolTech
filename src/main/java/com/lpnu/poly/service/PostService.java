@@ -1,24 +1,22 @@
 package com.lpnu.poly.service;
 
-import com.lpnu.poly.DTO.post.PostCreateRequest;
-import com.lpnu.poly.DTO.post.PostProfileResponse;
-import com.lpnu.poly.DTO.post.PostUpdateRequest;
-import org.springframework.http.ResponseEntity;
+import com.lpnu.poly.DTO.post.PostCreateDTO;
+import com.lpnu.poly.DTO.post.PostProfileDTO;
+import com.lpnu.poly.DTO.post.PostUpdateDTO;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostService {
 
-    ResponseEntity<PostProfileResponse> getPost(Long id);
+    PostProfileDTO getPost(Long id);
 
-    ResponseEntity<PostProfileResponse> deletePost(Long id);
+    PostProfileDTO deletePost(Long id);
 
-    ResponseEntity<PostProfileResponse> createPost(PostCreateRequest postCreateRequest);
+    PostProfileDTO createPost(PostCreateDTO postCreateDTO);
 
-    ResponseEntity<PostProfileResponse> updatePost(PostUpdateRequest postUpdateRequest);
+    PostProfileDTO updatePost(PostUpdateDTO postUpdateDTO);
 
-    ResponseEntity<List<PostProfileResponse>> getAllPost();
+    List<PostProfileDTO> getAllPost();
 
-    ResponseEntity<List<PostProfileResponse>> getFilteredPost(String title, String days, List<String> branches, List<String> hobby, String fromPage, String pageCount);
+    List<PostProfileDTO> getFilteredPost(String title, String days, List<String> branches, List<String> hobby, /*Pageable pageable*/int page, int size);
 }

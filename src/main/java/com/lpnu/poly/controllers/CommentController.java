@@ -1,7 +1,7 @@
 package com.lpnu.poly.controllers;
 
-import com.lpnu.poly.DTO.comment.CommentCreateRequest;
-import com.lpnu.poly.DTO.comment.CommentProfile;
+import com.lpnu.poly.DTO.comment.CommentCreateDTO;
+import com.lpnu.poly.DTO.comment.CommentProfileDTO;
 import com.lpnu.poly.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +22,13 @@ public class CommentController {
     }
 
     @PostMapping("v1/")
-    public ResponseEntity<CommentProfile> addComment(@Valid @RequestBody CommentCreateRequest commentCreateRequest){
-        return commentService.addComment(commentCreateRequest);
+    public ResponseEntity<CommentProfileDTO> addComment(@Valid @RequestBody CommentCreateDTO commentCreateDTO){
+        return commentService.addComment(commentCreateDTO);
     }
 
     @GetMapping("v1/byPost/{id}")
-    public ResponseEntity<List<CommentProfile>> getCommentByPost(@PathVariable("id") Long id){
+    public ResponseEntity<List<CommentProfileDTO>> getCommentByPost(@PathVariable("id") Long id){
         return commentService.getCommentByPost(id);
     }
-
 
 }

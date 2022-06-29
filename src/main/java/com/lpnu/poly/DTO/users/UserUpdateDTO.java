@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class UserUpdateRequest {
+public class UserUpdateDTO {
 
     @Email
     private String email;

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class UserCurrentResponse {
+public class UserCurrentDTO {
 
     private String lastName;
     private String middleName;

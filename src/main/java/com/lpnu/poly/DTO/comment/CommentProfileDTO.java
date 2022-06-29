@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class CommentProfile implements Convertable {
+public class CommentProfileDTO implements Convertable {
 
     private Long id;
     private String description;

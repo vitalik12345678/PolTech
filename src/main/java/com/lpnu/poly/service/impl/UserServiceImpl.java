@@ -2,10 +2,10 @@ package com.lpnu.poly.service.impl;
 
 import com.lpnu.poly.DTO.security.JWTResponse;
 import com.lpnu.poly.DTO.security.LoginRequest;
-import com.lpnu.poly.DTO.users.UserCreateRequest;
-import com.lpnu.poly.DTO.users.UserCurrentResponse;
-import com.lpnu.poly.DTO.users.UserProfileResponse;
-import com.lpnu.poly.DTO.users.UserUpdateRequest;
+import com.lpnu.poly.DTO.users.UserCreateDTO;
+import com.lpnu.poly.DTO.users.UserCurrentDTO;
+import com.lpnu.poly.DTO.users.UserProfileDTO;
+import com.lpnu.poly.DTO.users.UserUpdateDTO;
 import com.lpnu.poly.JWT.JWTUtils;
 import com.lpnu.poly.entity.*;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
@@ -73,70 +73,70 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ResponseEntity<UserProfileResponse> getUser(Long id) {
+    public ResponseEntity<UserProfileDTO> getUser(Long id) {
         User user = findUser(id);
-        UserProfileResponse userProfileResponse = dtoConvertor.convertToDTO(user, new UserProfileResponse());
-        return ResponseEntity.ok(userProfileResponse);
+        UserProfileDTO userProfileDTO = dtoConvertor.convertToDTO(user, new UserProfileDTO());
+        return ResponseEntity.ok(userProfileDTO);
     }
 
     @Override
-    public ResponseEntity<UserProfileResponse> deleteUser(Long id) {
+    public ResponseEntity<UserProfileDTO> deleteUser(Long id) {
         User user = findUser(id);
-        UserProfileResponse userProfileResponse = dtoConvertor.convertToDTO(user, new UserProfileResponse());
+        UserProfileDTO userProfileDTO = dtoConvertor.convertToDTO(user, new UserProfileDTO());
         userRepository.delete(user);
-        return ResponseEntity.ok(userProfileResponse);
+        return ResponseEntity.ok(userProfileDTO);
     }
 
     @Override
-    public ResponseEntity<UserProfileResponse> updateUser(UserUpdateRequest userUpdateRequest) {
-        User user = findUser(userUpdateRequest.getEmail());
+    public ResponseEntity<UserProfileDTO> updateUser(UserUpdateDTO userUpdateDTO) {
+        User user = findUser(userUpdateDTO.getEmail());
 
-        user.setUserBranches(getUserBranchesFromClient(user, userUpdateRequest.getBranch()));
-        user.setUserHobbies(getUserHobbyFromClient(user, userUpdateRequest.getHobby()));
+        user.setUserBranches(getUserBranchesFromClient(user, userUpdateDTO.getBranch()));
+        user.setUserHobbies(getUserHobbyFromClient(user, userUpdateDTO.getHobby()));
 
         userHobbyRepository.deleteAll(userHobbyRepository.findByUser(user));
         userBranchRepository.deleteAll(userBranchRepository.findByUser(user));
 
-        userBranchRepository.saveAll(getUserBranchesFromClient(user, userUpdateRequest.getBranch()));
-        userHobbyRepository.saveAll(getUserHobbyFromClient(user, userUpdateRequest.getHobby()));
+        userBranchRepository.saveAll(getUserBranchesFromClient(user, userUpdateDTO.getBranch()));
+        userHobbyRepository.saveAll(getUserHobbyFromClient(user, userUpdateDTO.getHobby()));
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(dtoConvertor.convertToDTO(user, new UserProfileResponse()));
+        return ResponseEntity.ok(dtoConvertor.convertToDTO(user, new UserProfileDTO()));
     }
 
 
     @Override
-    public ResponseEntity<UserProfileResponse> createUser(UserCreateRequest userCreateRequest) {
+    public ResponseEntity<UserProfileDTO> createUser(UserCreateDTO userCreateDTO) {
 
-        Optional<User> optionalUser = userRepository.findByEmail(userCreateRequest.getEmail());
+        Optional<User> optionalUser = userRepository.findByEmail(userCreateDTO.getEmail());
 
         if (optionalUser.isPresent()) {
             throw new ExistsException(USER_EXIST);
         }
 
-        User user = dtoConvertor.convertToEntity(userCreateRequest, new User());
-        user.setUserBranches(getUserBranchesFromClient(user, userCreateRequest.getBranch()));
-        user.setUserHobbies(getUserHobbyFromClient(user, userCreateRequest.getHobby()));
-        user.setPassword(encoder.encode(userCreateRequest.getPassword()));
-        user.setGraduate(Graduate.valueOf(userCreateRequest.getGraduate().toLowerCase(Locale.ROOT)));
+        User user = dtoConvertor.convertToEntity(userCreateDTO, new User());
+        user.setUserBranches(getUserBranchesFromClient(user, userCreateDTO.getBranch()));
+        user.setUserHobbies(getUserHobbyFromClient(user, userCreateDTO.getHobby()));
+        user.setPassword(encoder.encode(userCreateDTO.getPassword()));
+        user.setGraduate(Graduate.valueOf(userCreateDTO.getGraduate().toLowerCase(Locale.ROOT)));
         user.setRole(roleRepository.findByName(ROLE_USER).orElseThrow(() -> {
             throw new NotExistsException(ROLE_NOT_EXIST);
         }));
         userRepository.save(user);
-        userHobbyRepository.saveAll(getUserHobbyFromClient(user, userCreateRequest.getHobby()));
-        userBranchRepository.saveAll(getUserBranchesFromClient(user, userCreateRequest.getBranch()));
-        return new ResponseEntity<>(dtoConvertor.convertToDTO(user, new UserProfileResponse()), HttpStatus.CREATED);
+        userHobbyRepository.saveAll(getUserHobbyFromClient(user, userCreateDTO.getHobby()));
+        userBranchRepository.saveAll(getUserBranchesFromClient(user, userCreateDTO.getBranch()));
+        return new ResponseEntity<>(dtoConvertor.convertToDTO(user, new UserProfileDTO()), HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<UserCurrentResponse> getCurrentUser() {
+    public ResponseEntity<UserCurrentDTO> getCurrentUser() {
 
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         User user = findUser(userDetails.getUsername());
 
-        UserCurrentResponse response = dtoConvertor.convertToDTO(user, new UserCurrentResponse());
+        UserCurrentDTO response = dtoConvertor.convertToDTO(user, new UserCurrentDTO());
         response.setRole(String.valueOf(userDetails.getAuthorities().stream().findFirst().orElseThrow(() -> {
             throw new NotExistsException("Role doesn't exist");
         })));

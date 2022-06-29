@@ -1,7 +1,7 @@
 package com.lpnu.poly.service.impl;
 
-import com.lpnu.poly.DTO.comment.CommentCreateRequest;
-import com.lpnu.poly.DTO.comment.CommentProfile;
+import com.lpnu.poly.DTO.comment.CommentCreateDTO;
+import com.lpnu.poly.DTO.comment.CommentProfileDTO;
 import com.lpnu.poly.entity.Comment;
 import com.lpnu.poly.entity.Post;
 import com.lpnu.poly.entity.User;
@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CommentServiceImpl implements CommentService {
 
-    private final String USER_NOT_EXIST = "User doesn't exist";
-    private final String POST_NOT_EXIST = "Post doesn't exist";
-    private final String COMMENT_NOT_EXIST = "Comment doesn't exist";
+    private static final String USER_NOT_EXIST = "User doesn't exist";
+    private static final String POST_NOT_EXIST = "Post doesn't exist";
+    private static final String COMMENT_NOT_EXIST = "Comment doesn't exist";
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -44,29 +44,29 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ResponseEntity<CommentProfile> addComment(CommentCreateRequest commentCreateRequest) {
+    public ResponseEntity<CommentProfileDTO> addComment(CommentCreateDTO commentCreateDTO) {
 
-        User user = findUser(commentCreateRequest.getUserId());
-        Post post = findPost(commentCreateRequest.getPostId());
+        User user = findUser(commentCreateDTO.getUserId());
+        Post post = findPost(commentCreateDTO.getPostId());
 
         Comment comment = new Comment();
 
         comment.setUser(user);
         comment.setPost(post);
-        comment.setDescription(commentCreateRequest.getContext());
+        comment.setDescription(commentCreateDTO.getContext());
         comment.setDate(LocalDateTime.now());
 
         commentRepository.save(comment);
 
-        return ResponseEntity.ok(  dtoConvertor.convertToDTO(comment, new CommentProfile()) );
+        return ResponseEntity.ok(  dtoConvertor.convertToDTO(comment, new CommentProfileDTO()) );
     }
 
     @Override
-    public ResponseEntity<List<CommentProfile>> getCommentByPost(Long id) {
+    public ResponseEntity<List<CommentProfileDTO>> getCommentByPost(Long id) {
         List<Comment> comments = commentRepository.findByPost( findPost(id) );
-        List<CommentProfile> profiles = comments.stream().map( element -> {
-           return dtoConvertor.convertToDTO(element,new CommentProfile());
-        }).collect(Collectors.toList());
+        List<CommentProfileDTO> profiles = comments.stream().map
+                (element -> dtoConvertor.convertToDTO(element,new CommentProfileDTO()))
+                .collect(Collectors.toList());
         return ResponseEntity.ok(profiles);
     }
 

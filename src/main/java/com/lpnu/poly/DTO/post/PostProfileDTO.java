@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostProfileResponse implements Convertable {
+public class PostProfileDTO implements Convertable {
 
     private String title;
     private String context;

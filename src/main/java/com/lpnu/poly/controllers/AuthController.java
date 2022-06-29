@@ -2,8 +2,8 @@ package com.lpnu.poly.controllers;
 
 import com.lpnu.poly.DTO.security.JWTResponse;
 import com.lpnu.poly.DTO.security.LoginRequest;
-import com.lpnu.poly.DTO.users.UserCreateRequest;
-import com.lpnu.poly.DTO.users.UserProfileResponse;
+import com.lpnu.poly.DTO.users.UserCreateDTO;
+import com.lpnu.poly.DTO.users.UserProfileDTO;
 import com.lpnu.poly.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserProfileResponse> registerUser(@RequestBody UserCreateRequest signUpRequest) {
+    public ResponseEntity<UserProfileDTO> registerUser(@RequestBody UserCreateDTO signUpRequest) {
       return  userService.createUser(signUpRequest);
     }
 }

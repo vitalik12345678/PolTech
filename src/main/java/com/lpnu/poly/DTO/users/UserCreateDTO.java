@@ -8,7 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class UserCreateRequest {
+public class UserCreateDTO {
 
     @NotBlank
     @Email

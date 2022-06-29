@@ -1,8 +1,8 @@
 package com.lpnu.poly.service.impl;
 
-import com.lpnu.poly.DTO.post.PostCreateRequest;
-import com.lpnu.poly.DTO.post.PostProfileResponse;
-import com.lpnu.poly.DTO.post.PostUpdateRequest;
+import com.lpnu.poly.DTO.post.PostCreateDTO;
+import com.lpnu.poly.DTO.post.PostProfileDTO;
+import com.lpnu.poly.DTO.post.PostUpdateDTO;
 import com.lpnu.poly.entity.*;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
 import com.lpnu.poly.exception.ExistsException;
@@ -10,22 +10,20 @@ import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
 import com.lpnu.poly.service.PostService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +31,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PostServiceImpl implements PostService {
 
-    private static final String USER_NOT_EXIST = "User doesn't exist";
-    private static final String POST_NOT_EXIST = "Post doesn't exist";
-    private static final String BRANCH_NOT_EXIST = "Branch doesn't exist";
-    private static final String HOBBY_NOT_EXIST = "Hobby doesn't exist";
-    private static final String POST_EXIST = "Post exist";
+    private static final String USER_NOT_EXIST = "User doesn't exist ";
+    private static final String POST_NOT_EXIST = "Post doesn't exist ";
+    private static final String BRANCH_NOT_EXIST = "Branch doesn't exist ";
+    private static final String HOBBY_NOT_EXIST = "Hobby doesn't exist ";
+    private static final String POST_EXIST = "Post exists ";
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostHobbyRepository postHobbyRepository;
@@ -58,131 +56,107 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseEntity<PostProfileResponse> getPost(Long id) {
-        Post post = findPost(id);
-        PostProfileResponse postProfileResponse = dtoConvertor.convertToDTO(post, new PostProfileResponse());
-        return ResponseEntity.ok(postProfileResponse);
+    public PostProfileDTO getPost(Long id) {
+        return dtoConvertor.convertToDTO(findPost(id), new PostProfileDTO());
     }
 
     @Override
-    public ResponseEntity<PostProfileResponse> deletePost(Long id) {
+    public PostProfileDTO deletePost(Long id) {
         Post post = findPost(id);
-        PostProfileResponse postProfileResponse = dtoConvertor.convertToDTO(post, new PostProfileResponse());
         postRepository.delete(post);
-        return ResponseEntity.ok(postProfileResponse);
+        return dtoConvertor.convertToDTO(post, new PostProfileDTO());
     }
 
     @Override
-    public ResponseEntity<PostProfileResponse> createPost(PostCreateRequest postCreateRequest) {
+    public PostProfileDTO createPost(PostCreateDTO postCreateDTO) {
 
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Optional<Post> optionalPost = postRepository.findByTitle(postCreateRequest.getTitle());
-        if (optionalPost.isPresent()){
+        Optional<Post> optionalPost = postRepository.findByTitle(postCreateDTO.getTitle());
+        if (optionalPost.isPresent()) {
             throw new ExistsException(POST_EXIST);
         }
 
         User user = findUser(userDetails.getUsername());
 
-        Post post = dtoConvertor.convertToEntity(postCreateRequest,new Post());
+        Post post = dtoConvertor.convertToEntity(postCreateDTO, new Post());
         post.setUser(user);
-        post.setPostHobbies(getPostHobbyFromClient(post, postCreateRequest.getHobby()));
-        post.setPostBranches(getPostBranchesFromClient(post, postCreateRequest.getBranch()));
+        post.setPostHobbies(getPostHobbyFromClient(post, postCreateDTO.getHobby()));
+        post.setPostBranches(getPostBranchesFromClient(post, postCreateDTO.getBranch()));
         post.setPublishedDate(LocalDateTime.now());
 
         postRepository.save(post);
-        postBranchRepository.saveAll(getPostBranchesFromClient(post,postCreateRequest.getBranch()));
-        postHobbyRepository.saveAll(getPostHobbyFromClient(post,postCreateRequest.getHobby()));
+        postBranchRepository.saveAll(getPostBranchesFromClient(post, postCreateDTO.getBranch()));
+        postHobbyRepository.saveAll(getPostHobbyFromClient(post, postCreateDTO.getHobby()));
 
-        PostProfileResponse postProfileResponse = dtoConvertor.convertToDTO(post,new PostProfileResponse());
-
-        return ResponseEntity.ok(postProfileResponse);
+        return dtoConvertor.convertToDTO(post, new PostProfileDTO());
     }
 
     @Override
-    public ResponseEntity<PostProfileResponse> updatePost(PostUpdateRequest postUpdateRequest) {
+    public PostProfileDTO updatePost(PostUpdateDTO postUpdateDTO) {
 
-        Post post = findPost(postUpdateRequest.getTitle());
+        Post post = findPost(postUpdateDTO.getTitle());
 
-        post.setPostBranches(getPostBranchesFromClient(post, postUpdateRequest.getBranch()));
-        post.setPostHobbies(getPostHobbyFromClient(post, postUpdateRequest.getHobby()));
+        post.setPostBranches(getPostBranchesFromClient(post, postUpdateDTO.getBranch()));
+        post.setPostHobbies(getPostHobbyFromClient(post, postUpdateDTO.getHobby()));
 
         postHobbyRepository.deleteAll(postHobbyRepository.findByPost(post));
         postBranchRepository.deleteAll(postBranchRepository.findByPost(post));
 
-        postHobbyRepository.saveAll(getPostHobbyFromClient(post,postUpdateRequest.getHobby()));
-        postBranchRepository.saveAll(getPostBranchesFromClient(post,postUpdateRequest.getBranch()));
+        postHobbyRepository.saveAll(getPostHobbyFromClient(post, postUpdateDTO.getHobby()));
+        postBranchRepository.saveAll(getPostBranchesFromClient(post, postUpdateDTO.getBranch()));
 
         postRepository.save(post);
-        return ResponseEntity.ok(dtoConvertor.convertToDTO(post,new PostProfileResponse()));
+        return dtoConvertor.convertToDTO(post, new PostProfileDTO());
     }
 
     @Override
-    public ResponseEntity<List<PostProfileResponse>> getAllPost() {
-
-        List<Post> posts = postRepository.findAll();
-
-        List<PostProfileResponse> response = posts.stream().map( element -> dtoConvertor.convertToDTO(element,new PostProfileResponse())).collect(Collectors.toList());
-
-        return ResponseEntity.ok( response );
+    public List<PostProfileDTO> getAllPost() {
+        return postRepository.findAll().stream().map(element -> dtoConvertor.convertToDTO(element, new PostProfileDTO())).collect(Collectors.toList());
     }
 
     @Override
-    public ResponseEntity<List<PostProfileResponse>> getFilteredPost(String title, String days, List<String> branches, List<String> hobby, String fromPage, String pageCount) {
+    public List<PostProfileDTO> getFilteredPost(String title, String days, List<String> branches, List<String> hobby,/* Pageable pageable*/int page, int size) {
 
-        LocalDateTime  date = LocalDateTime.parse(days);
 
-        List<Branch> branchList = branches.stream().map( element -> {
-            return branchRepository.findByName(element).get();
-        }).collect(Collectors.toList());
+        List<Branch> branchList = branches.stream().map(element ->
+                branchRepository.findByName(element).orElseThrow(() -> {
+                    throw new NotExistsException(BRANCH_NOT_EXIST + element);
+                })
+        ).collect(Collectors.toList());
 
         Set<PostBranch> postBranches = postBranchRepository.findDistinctByBranchIn(branchList);
 
-        Set<Hobby> hobbies = hobby.stream().map( element -> {
-            return hobbyRepository.findByName(element).get();
-        }).collect(Collectors.toSet ());
+        Set<Hobby> hobbies = hobby.stream().map(element ->
+                hobbyRepository.findByName(element).orElseThrow(() -> {
+                    throw new NotExistsException(BRANCH_NOT_EXIST + element);
+                })).collect(Collectors.toSet());
 
         Set<PostHobby> postHobbies = postHobbyRepository.findDistinctByHobbyIn(hobbies);
 
-        Pageable pageable = PageRequest.of(Integer.parseInt(fromPage),Integer.parseInt(pageCount),Sort.by("publishedDate").descending());
+        Pageable pageable = PageRequest.of((page), (size), Sort.by("publishedDate").descending());
 
-        Page<Post> resultPosts = postRepository.findByTitleContainingIgnoreCaseAndPublishedDateGreaterThanAndPostBranchesInAndPostHobbiesIn(title,date,postBranches,postHobbies,pageable);
+        Page<Post> resultPosts = postRepository.findDistinctByTitleContainingIgnoreCaseAndPublishedDateGreaterThanAndPostBranchesInAndPostHobbiesIn(title, LocalDateTime.parse(days), postBranches, postHobbies, pageable);
 
-        List<PostProfileResponse> responses = new ArrayList<>();
-
-        resultPosts.getContent().forEach( x -> {
-            responses.add(dtoConvertor.convertToDTO(x,new PostProfileResponse()));
-        });
-
-        return  ResponseEntity.ok(responses);
+        return resultPosts.getContent().stream().map(element -> dtoConvertor.convertToDTO(element, new PostProfileDTO())).collect(Collectors.toList());
     }
 
     private List<PostHobby> getPostHobbyFromClient(Post post, List<String> hobby) {
-        List<PostHobby> postHobbies = new ArrayList<>();
-
-        hobby.forEach(hobbyName -> {
-
+        return hobby.stream().map(hobbyName -> {
             PostHobby postHobby = new PostHobby();
             postHobby.setPost(post);
             postHobby.setHobby(findHobby(hobbyName));
-            postHobbies.add(postHobby);
-
-        });
-        return postHobbies;
+            return postHobby;
+        }).collect(Collectors.toList());
     }
 
     private List<PostBranch> getPostBranchesFromClient(Post post, List<String> branch) {
-        List<PostBranch> postBranches = new ArrayList<>();
-
-        branch.forEach(branchName -> {
-
+        return branch.stream().map(branchName -> {
             PostBranch postBranch = new PostBranch();
             postBranch.setPost(post);
             postBranch.setBranch(findBranch(branchName));
-            postBranches.add(postBranch);
-
-        });
-        return postBranches;
+            return postBranch;
+        }).collect(Collectors.toList());
     }
 
     private Post findPost(Long id) {

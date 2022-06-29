@@ -1,15 +1,15 @@
 package com.lpnu.poly.service;
 
-import com.lpnu.poly.DTO.comment.CommentCreateRequest;
-import com.lpnu.poly.DTO.comment.CommentProfile;
+import com.lpnu.poly.DTO.comment.CommentCreateDTO;
+import com.lpnu.poly.DTO.comment.CommentProfileDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface CommentService {
 
-    ResponseEntity<CommentProfile> addComment(CommentCreateRequest commentCreateRequest);
+    ResponseEntity<CommentProfileDTO> addComment(CommentCreateDTO commentCreateDTO);
 
-    ResponseEntity<List<CommentProfile>> getCommentByPost(Long id);
+    ResponseEntity<List<CommentProfileDTO>> getCommentByPost(Long id);
 
 }

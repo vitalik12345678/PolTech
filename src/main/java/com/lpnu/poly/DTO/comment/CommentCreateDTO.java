@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class CommentCreateRequest implements Convertable {
+public class CommentCreateDTO implements Convertable {
 
     @NotBlank
     private String context;
