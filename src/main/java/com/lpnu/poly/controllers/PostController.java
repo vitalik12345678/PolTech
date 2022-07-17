@@ -6,6 +6,7 @@ import com.lpnu.poly.DTO.post.PostUpdateDTO;
 import com.lpnu.poly.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,12 +29,14 @@ public class PostController {
     }
 
     @GetMapping("v1/allPost")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<List<PostProfileDTO>> getAllPost() {
         return ResponseEntity.ok(postService.getAllPost());
     }
 
 
     @GetMapping("v1/filter")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<List<PostProfileDTO>> getFilteredPost(@RequestParam(value = "title", required = false) String title,
                                                                 @RequestParam(value = "days", required = false) String days,
                                                                 @RequestParam(value = "hobby", required = false) List<String> hobby,
@@ -44,16 +47,19 @@ public class PostController {
     }
 
     @PostMapping("v1")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<PostProfileDTO> createPost(@Valid @RequestBody PostCreateDTO postCreateDTO) {
         return ResponseEntity.ok(postService.createPost(postCreateDTO));
     }
 
     @DeleteMapping("v1/{id}")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<PostProfileDTO> deletePost(@PathVariable("id") Long id) {
         return ResponseEntity.ok(postService.deletePost(id));
     }
 
     @PutMapping("v1/{id}")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<PostProfileDTO> updatePost(@PathVariable("id") Long id, @RequestBody PostUpdateDTO postUpdateDTO) {
         return ResponseEntity.ok(postService.updatePost(postUpdateDTO));
     }
