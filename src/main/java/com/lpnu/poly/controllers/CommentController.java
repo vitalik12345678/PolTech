@@ -5,6 +5,7 @@ import com.lpnu.poly.DTO.comment.CommentProfileDTO;
 import com.lpnu.poly.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,11 +23,13 @@ public class CommentController {
     }
 
     @PostMapping("v1/")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<CommentProfileDTO> addComment(@Valid @RequestBody CommentCreateDTO commentCreateDTO){
         return commentService.addComment(commentCreateDTO);
     }
 
     @GetMapping("v1/byPost/{id}")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<List<CommentProfileDTO>> getCommentByPost(@PathVariable("id") Long id){
         return commentService.getCommentByPost(id);
     }
