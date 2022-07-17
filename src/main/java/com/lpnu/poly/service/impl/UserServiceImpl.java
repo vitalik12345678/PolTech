@@ -73,22 +73,19 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ResponseEntity<UserProfileDTO> getUser(Long id) {
-        User user = findUser(id);
-        UserProfileDTO userProfileDTO = dtoConvertor.convertToDTO(user, new UserProfileDTO());
-        return ResponseEntity.ok(userProfileDTO);
+    public UserProfileDTO getUser(Long id) {
+        return dtoConvertor.convertToDTO(findUser(id), new UserProfileDTO());
     }
 
     @Override
-    public ResponseEntity<UserProfileDTO> deleteUser(Long id) {
+    public UserProfileDTO deleteUser(Long id) {
         User user = findUser(id);
-        UserProfileDTO userProfileDTO = dtoConvertor.convertToDTO(user, new UserProfileDTO());
         userRepository.delete(user);
-        return ResponseEntity.ok(userProfileDTO);
+        return dtoConvertor.convertToDTO(user, new UserProfileDTO());
     }
 
     @Override
-    public ResponseEntity<UserProfileDTO> updateUser(UserUpdateDTO userUpdateDTO) {
+    public UserProfileDTO updateUser(UserUpdateDTO userUpdateDTO) {
         User user = findUser(userUpdateDTO.getEmail());
 
         user.setUserBranches(getUserBranchesFromClient(user, userUpdateDTO.getBranch()));
@@ -102,12 +99,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(dtoConvertor.convertToDTO(user, new UserProfileDTO()));
+        return dtoConvertor.convertToDTO(user, new UserProfileDTO());
     }
 
 
     @Override
-    public ResponseEntity<UserProfileDTO> createUser(UserCreateDTO userCreateDTO) {
+    public UserProfileDTO createUser(UserCreateDTO userCreateDTO) {
 
         Optional<User> optionalUser = userRepository.findByEmail(userCreateDTO.getEmail());
 
@@ -126,11 +123,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         userHobbyRepository.saveAll(getUserHobbyFromClient(user, userCreateDTO.getHobby()));
         userBranchRepository.saveAll(getUserBranchesFromClient(user, userCreateDTO.getBranch()));
-        return new ResponseEntity<>(dtoConvertor.convertToDTO(user, new UserProfileDTO()), HttpStatus.CREATED);
+        return dtoConvertor.convertToDTO(user, new UserProfileDTO());
     }
 
     @Override
-    public ResponseEntity<UserCurrentDTO> getCurrentUser() {
+    public UserCurrentDTO getCurrentUser() {
 
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -140,45 +137,35 @@ public class UserServiceImpl implements UserService {
         response.setRole(String.valueOf(userDetails.getAuthorities().stream().findFirst().orElseThrow(() -> {
             throw new NotExistsException("Role doesn't exist");
         })));
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     @Override
-    public ResponseEntity<JWTResponse> singin(LoginRequest loginRequest) {
+    public JWTResponse singin(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-        return ResponseEntity.ok(new JWTResponse(jwt, roles));
+        return new JWTResponse(jwt, roles);
     }
 
     private List<UserHobby> getUserHobbyFromClient(User user, List<String> hobby) {
-        List<UserHobby> postHobbies = new ArrayList<>();
-
-        hobby.forEach(hobbyName -> {
-
+        return hobby.stream().map(hobbyName -> {
             UserHobby userHobby = new UserHobby();
             userHobby.setUser(user);
             userHobby.setHobby(findHobby(hobbyName));
-            postHobbies.add(userHobby);
-
-        });
-        return postHobbies;
+            return userHobby;
+        }).collect(Collectors.toList());
     }
 
     private List<UserBranch> getUserBranchesFromClient(User user, List<String> branch) {
-        List<UserBranch> userBranches = new ArrayList<>();
-
-        branch.forEach(branchName -> {
-
+        return branch.stream().map( branchName -> {
             UserBranch userBranch = new UserBranch();
             userBranch.setUser(user);
             userBranch.setBranch(findBranch(branchName));
-            userBranches.add(userBranch);
-
-        });
-        return userBranches;
+            return userBranch;
+        }).collect(Collectors.toList());
     }
 
     private User findUser(Long id) {

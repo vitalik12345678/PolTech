@@ -6,6 +6,7 @@ import com.lpnu.poly.DTO.users.UserCreateDTO;
 import com.lpnu.poly.DTO.users.UserProfileDTO;
 import com.lpnu.poly.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +25,11 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<JWTResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        return userService.singin(loginRequest);
+        return ResponseEntity.ok(userService.singin(loginRequest));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<UserProfileDTO> registerUser(@RequestBody UserCreateDTO signUpRequest) {
-      return  userService.createUser(signUpRequest);
+      return  ResponseEntity.ok( userService.createUser(signUpRequest));
     }
 }

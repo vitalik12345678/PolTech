@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Scanner;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -22,31 +25,30 @@ public class UserController {
 
     @PostMapping(value = "/v1/")
     public ResponseEntity<UserProfileDTO> createUser(@RequestBody UserCreateDTO userCreateDTO) {
-        return userService.createUser(userCreateDTO);
+        return ResponseEntity.ok(userService.createUser(userCreateDTO));
     }
 
 
     @PutMapping(value = "/v1/")
     public ResponseEntity<UserProfileDTO> updateUser(
             //   @Valid
-            @RequestBody
-                    UserUpdateDTO userUpdateDTO) {
-        return userService.updateUser(userUpdateDTO);
+            @RequestBody UserUpdateDTO userUpdateDTO) {
+        return ResponseEntity.ok(userService.updateUser(userUpdateDTO));
     }
 
     @DeleteMapping(value = "/v1/{id}")
     public ResponseEntity<UserProfileDTO> deleteUser(@PathVariable("id") Long id) {
-        return userService.deleteUser(id);
+        return ResponseEntity.ok(userService.deleteUser(id));
     }
 
     @GetMapping(value = "/v1/{id}")
     public ResponseEntity<UserProfileDTO> getUser(@PathVariable("id") Long id) {
-        return userService.getUser(id);
+        return ResponseEntity.ok(userService.getUser(id));
     }
 
     @GetMapping(value = "/v1/current/")
     public ResponseEntity<UserCurrentDTO> getCurrentUser() {
-        return userService.getCurrentUser();
+        return ResponseEntity.ok( userService.getCurrentUser());
     }
 
 }

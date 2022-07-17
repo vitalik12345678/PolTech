@@ -10,16 +10,16 @@ import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
-    ResponseEntity<UserProfileDTO> getUser(Long id);
+    UserProfileDTO getUser(Long id);
 
-    ResponseEntity<UserProfileDTO> deleteUser(Long id);
+    UserProfileDTO deleteUser(Long id);
 
-    ResponseEntity<UserProfileDTO> updateUser(UserUpdateDTO userUpdateProfile);
+    UserProfileDTO updateUser(UserUpdateDTO userUpdateProfile);
 
-    ResponseEntity<UserProfileDTO> createUser(UserCreateDTO playerCreateProfile);
+    UserProfileDTO createUser(UserCreateDTO playerCreateProfile);
 
-    ResponseEntity<UserCurrentDTO> getCurrentUser();
+    UserCurrentDTO getCurrentUser();
 
-    ResponseEntity<JWTResponse> singin(LoginRequest loginRequest);
+    JWTResponse singin(LoginRequest loginRequest);
 
 }
