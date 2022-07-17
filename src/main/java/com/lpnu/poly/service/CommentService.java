@@ -12,4 +12,7 @@ public interface CommentService {
 
     ResponseEntity<List<CommentProfileDTO>> getCommentByPost(Long id);
 
+    CommentProfileDTO deleteComment(Long id);
+
+    CommentProfileDTO updateComment(Long id);
 }

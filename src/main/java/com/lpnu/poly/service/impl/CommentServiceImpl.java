@@ -10,10 +10,13 @@ import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.CommentRepository;
 import com.lpnu.poly.repository.PostRepository;
 import com.lpnu.poly.repository.UserRepository;
+import com.lpnu.poly.security.UserDetailsImpl;
 import com.lpnu.poly.service.CommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +29,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CommentServiceImpl implements CommentService {
 
+    private static final String USER_IS_NOT_EXIST = "User not exist";
     private static final String USER_NOT_EXIST = "User doesn't exist";
     private static final String POST_NOT_EXIST = "Post doesn't exist";
     private static final String COMMENT_NOT_EXIST = "Comment doesn't exist";
+    private static final String DIFFERENT_USER_ID_AND_COMMENT_ID = "user doesn't write this comment";
+    private static final String ROLE_ADMIN = "ROLE_admin";
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -58,26 +64,48 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.save(comment);
 
-        return ResponseEntity.ok(  dtoConvertor.convertToDTO(comment, new CommentProfileDTO()) );
+        return ResponseEntity.ok(dtoConvertor.convertToDTO(comment, new CommentProfileDTO()));
     }
 
     @Override
     public ResponseEntity<List<CommentProfileDTO>> getCommentByPost(Long id) {
-        List<Comment> comments = commentRepository.findByPost( findPost(id) );
-        List<CommentProfileDTO> profiles = comments.stream().map
-                (element -> dtoConvertor.convertToDTO(element,new CommentProfileDTO()))
-                .collect(Collectors.toList());
+        List<Comment> comments = commentRepository.findByPost(findPost(id));
+        List<CommentProfileDTO> profiles = comments.stream().map(element -> dtoConvertor.convertToDTO(element, new CommentProfileDTO())).collect(Collectors.toList());
         return ResponseEntity.ok(profiles);
     }
 
-    private User findUser(Long id){
-        return userRepository.findById(id).orElseThrow( () -> {
+    @Override
+    public CommentProfileDTO deleteComment(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> {
+            throw new NotExistsException(COMMENT_NOT_EXIST);
+        });
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority(ROLE_ADMIN)) && !userDetails.getId().equals(comment.getUser().getId())) {
+            throw new NotExistsException(DIFFERENT_USER_ID_AND_COMMENT_ID);
+        }
+        commentRepository.delete(comment);
+        return dtoConvertor.convertToDTO(comment, new CommentProfileDTO());
+    }
+
+    @Override
+    public CommentProfileDTO updateComment(Long id) {
+        return null;
+    }
+
+    private User findUser(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> {
             throw new NotExistsException(USER_NOT_EXIST);
         });
     }
 
-    private Post findPost(Long id){
-        return postRepository.findById(id).orElseThrow( () -> {
+    private User findUser(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new NotExistsException(USER_IS_NOT_EXIST);
+        });
+    }
+
+    private Post findPost(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> {
             throw new NotExistsException(POST_NOT_EXIST);
         });
     }
