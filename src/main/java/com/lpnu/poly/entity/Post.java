@@ -36,6 +36,9 @@ public class Post implements Convertable {
     @Column(name = "avatar_uri")
     private String avatarURI;
 
+    @Column(name = "comments_available")
+    private Boolean commentsAvailable;
+
     @OneToMany(mappedBy = "post")
     private List<PostEstimant> postEstimants;
 
