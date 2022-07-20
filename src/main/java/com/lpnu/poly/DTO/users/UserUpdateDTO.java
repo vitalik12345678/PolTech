@@ -19,16 +19,7 @@ public class UserUpdateDTO {
     @Max(2300)
     private Integer graduationYear;
 
-    @NotNull
-    private List<String> branch;
-
-    @NotBlank
-    private String graduate;
-
     private String  work;
-
-    @NotNull
-    private List<String> hobby;
 
     @NotBlank
     @Pattern(regexp = "^[А-Яа-я]*$")
