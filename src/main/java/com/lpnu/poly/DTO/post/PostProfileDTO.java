@@ -16,4 +16,5 @@ public class PostProfileDTO implements Convertable {
     private LocalDateTime publishedDate;
     private Long userId;
     private Long fileId;
+    private Long id;
 }

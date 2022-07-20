@@ -9,6 +9,7 @@ import lombok.Setter;
 public class CommentProfileDTO implements Convertable {
 
     private Long id;
+    private Long userId;
     private String description;
 
 }

@@ -88,14 +88,12 @@ public class UserServiceImpl implements UserService {
     public UserProfileDTO updateUser(UserUpdateDTO userUpdateDTO) {
         User user = findUser(userUpdateDTO.getEmail());
 
-        user.setUserBranches(getUserBranchesFromClient(user, userUpdateDTO.getBranch()));
-        user.setUserHobbies(getUserHobbyFromClient(user, userUpdateDTO.getHobby()));
-
-        userHobbyRepository.deleteAll(userHobbyRepository.findByUser(user));
-        userBranchRepository.deleteAll(userBranchRepository.findByUser(user));
-
-        userBranchRepository.saveAll(getUserBranchesFromClient(user, userUpdateDTO.getBranch()));
-        userHobbyRepository.saveAll(getUserHobbyFromClient(user, userUpdateDTO.getHobby()));
+        user.setEmail(userUpdateDTO.getEmail());
+        user.setFirstName(userUpdateDTO.getFirstName());
+        user.setMiddleName(userUpdateDTO.getMiddleName());
+        user.setLastName(userUpdateDTO.getLastName());
+        user.setGraduationYear(userUpdateDTO.getGraduationYear());
+        user.setWork(userUpdateDTO.getWork());
 
         userRepository.save(user);
 
