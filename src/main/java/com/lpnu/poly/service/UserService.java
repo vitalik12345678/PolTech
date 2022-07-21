@@ -6,7 +6,6 @@ import com.lpnu.poly.DTO.users.UserCreateDTO;
 import com.lpnu.poly.DTO.users.UserCurrentDTO;
 import com.lpnu.poly.DTO.users.UserProfileDTO;
 import com.lpnu.poly.DTO.users.UserUpdateDTO;
-import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
@@ -14,7 +13,7 @@ public interface UserService {
 
     UserProfileDTO deleteUser(Long id);
 
-    UserProfileDTO updateUser(UserUpdateDTO userUpdateProfile);
+    UserProfileDTO updateUser(UserUpdateDTO userUpdateProfile, Long id);
 
     UserProfileDTO createUser(UserCreateDTO playerCreateProfile);
 
