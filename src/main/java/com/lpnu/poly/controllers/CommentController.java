@@ -34,12 +34,12 @@ public class CommentController {
         return commentService.getCommentByPost(id);
     }
 
-   /* @PutMapping("v1/{id}/{isAdmin}")
+    @PutMapping("v1/{id}")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<CommentProfileDTO> updateComment(@PathVariable Long id,){
-        ResponseEntity.ok(commentService.updateComment(id));
+    public ResponseEntity<CommentProfileDTO> updateComment(@PathVariable Long id,@RequestParam("description") String description){
+       return ResponseEntity.ok(commentService.updateComment(id,description));
     }
-*/
+
     @DeleteMapping("v1/{id}")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<CommentProfileDTO> deleteComment(@PathVariable("id") Long id){

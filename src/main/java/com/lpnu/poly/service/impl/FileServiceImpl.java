@@ -103,10 +103,10 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<String> getUserFile(String email) {
+    public String getUserFile(String email) {
         User user = userRepository.findByEmail(email).orElseThrow( () -> {
             throw new NotExistsException(USER_NOT_EXIST);
         });
-        return ResponseEntity.ok(awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),user.getAvatar(), HttpMethod.GET));
+        return awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),user.getAvatar(), HttpMethod.GET);
     }
 }

@@ -20,5 +20,7 @@ public class PostCreateDTO {
     private List<String> branch;
     @NotEmpty(message = "Post hobby/hobbies are empty")
     private List<String> hobby;
+    @NotNull
+    private boolean commentsAvailable;
 
 }

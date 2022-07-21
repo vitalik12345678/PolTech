@@ -14,8 +14,6 @@ public class CommentCreateDTO implements Convertable {
     @NotBlank
     private String context;
     @NotNull
-    private Long userId;
-    @NotNull
     private Long postId;
 
 

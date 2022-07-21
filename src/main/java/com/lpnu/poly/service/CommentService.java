@@ -14,5 +14,5 @@ public interface CommentService {
 
     CommentProfileDTO deleteComment(Long id);
 
-    CommentProfileDTO updateComment(Long id);
+    CommentProfileDTO updateComment(Long id, String description);
 }

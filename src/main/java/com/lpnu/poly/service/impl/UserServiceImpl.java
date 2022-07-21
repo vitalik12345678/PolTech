@@ -13,11 +13,10 @@ import com.lpnu.poly.exception.ExistsException;
 import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
 import com.lpnu.poly.security.UserDetailsImpl;
+import com.lpnu.poly.service.FileService;
 import com.lpnu.poly.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -55,10 +53,11 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JWTUtils jwtUtils;
     private final PasswordEncoder encoder;
+    private final FileService fileService;
 
 
     @Autowired
-    public UserServiceImpl(BranchRepository branchRepository, UserRepository usersRepository, DTOConvertor dtoConvertor, HobbyRepository hobbyRepository, UserBranchRepository userBranchRepository, UserHobbyRepository userHobbyRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JWTUtils jwtUtils, PasswordEncoder encoder) {
+    public UserServiceImpl(BranchRepository branchRepository, UserRepository usersRepository, DTOConvertor dtoConvertor, HobbyRepository hobbyRepository, UserBranchRepository userBranchRepository, UserHobbyRepository userHobbyRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JWTUtils jwtUtils, PasswordEncoder encoder, FileService fileService) {
         this.branchRepository = branchRepository;
         this.userRepository = usersRepository;
         this.dtoConvertor = dtoConvertor;
@@ -69,12 +68,15 @@ public class UserServiceImpl implements UserService {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.encoder = encoder;
+        this.fileService = fileService;
     }
 
 
     @Override
     public UserProfileDTO getUser(Long id) {
-        return dtoConvertor.convertToDTO(findUser(id), new UserProfileDTO());
+        User user = findUser(id);
+        user.setAvatar(fileService.getUserFile(user.getEmail()));
+        return dtoConvertor.convertToDTO(user,new UserProfileDTO());
     }
 
     @Override
@@ -85,19 +87,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileDTO updateUser(UserUpdateDTO userUpdateDTO) {
-        User user = findUser(userUpdateDTO.getEmail());
+    public UserProfileDTO updateUser(UserUpdateDTO userUpdateDTO, Long id) {
+       /* User user = findUser(userUpdateDTO.getEmail());
 
-        user.setEmail(userUpdateDTO.getEmail());
-        user.setFirstName(userUpdateDTO.getFirstName());
-        user.setMiddleName(userUpdateDTO.getMiddleName());
-        user.setLastName(userUpdateDTO.getLastName());
-        user.setGraduationYear(userUpdateDTO.getGraduationYear());
-        user.setWork(userUpdateDTO.getWork());
+        user = dtoConvertor.convertToEntity(userUpdateDTO,user);
 
         userRepository.save(user);
 
-        return dtoConvertor.convertToDTO(user, new UserProfileDTO());
+        return dtoConvertor.convertToDTO(user, new UserProfileDTO());*/
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User existUser = findUser(id);
+        Optional<User> potentialUser = userRepository.findByEmail(userUpdateDTO.getEmail());
+
+        return null;
     }
 
 
@@ -135,6 +138,7 @@ public class UserServiceImpl implements UserService {
         response.setRole(String.valueOf(userDetails.getAuthorities().stream().findFirst().orElseThrow(() -> {
             throw new NotExistsException("Role doesn't exist");
         })));
+        response.setAvatar(fileService.getUserFile(user.getEmail()));
         return response;
     }
 

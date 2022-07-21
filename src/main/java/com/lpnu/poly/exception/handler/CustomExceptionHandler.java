@@ -27,6 +27,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(e, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public final ResponseEntity<Object> handleForbiddenException(ForbiddenException e){
+        return buildExceptionBody(e, HttpStatus.FORBIDDEN);
+    }
+
     @org.springframework.web.bind.annotation.ExceptionHandler(BadRequestException.class)
     public final ResponseEntity<Object> handleBadRequestException(BadRequestException e) {
         return buildExceptionBody(e, BAD_REQUEST);

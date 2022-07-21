@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -31,12 +32,12 @@ public class UserController {
     }
 
 
-    @PutMapping(value = "/v1/")
+    @PutMapping(value = "/v1/{id}")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<UserProfileDTO> updateUser(
-            //   @Valid
+            @PathVariable("id") Long id,
             @RequestBody UserUpdateDTO userUpdateDTO) {
-        return ResponseEntity.ok(userService.updateUser(userUpdateDTO));
+        return ResponseEntity.ok(userService.updateUser(userUpdateDTO,id));
     }
 
     @DeleteMapping(value = "/v1/{id}")
