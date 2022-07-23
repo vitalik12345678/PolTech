@@ -13,7 +13,7 @@ public class PostProfileDTO implements Convertable {
 
     private String title;
     private String context;
-    private String commentsAvailable;
+    private Boolean commentsAvailable;
     private LocalDateTime publishedDate;
     private Long userId;
     private Long fileId;
