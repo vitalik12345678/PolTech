@@ -22,7 +22,6 @@ public class HobbyController {
     }
 
     @GetMapping("v1/allHobby")
-    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<List<String>> getAllHobby(){
         return hobbyService.getAllHobby();
     }

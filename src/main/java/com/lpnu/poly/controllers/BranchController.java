@@ -23,7 +23,6 @@ public class BranchController {
     }
 
     @GetMapping("v1/allBranch")
-    @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<List<String>> getAllBranch(){
         return branchService.getAllBranch();
     }

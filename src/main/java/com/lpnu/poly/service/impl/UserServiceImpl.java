@@ -75,8 +75,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileDTO getUser(Long id) {
         User user = findUser(id);
-        user.setAvatar(fileService.getUserFile(user.getEmail()));
-        return dtoConvertor.convertToDTO(user,new UserProfileDTO());
+        UserProfileDTO response = dtoConvertor.convertToDTO(user,new UserProfileDTO());
+        response.setAvatar(fileService.getUserFile(user.getEmail()));
+        return response;
     }
 
     @Override
