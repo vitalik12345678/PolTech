@@ -13,11 +13,11 @@ public interface UserService {
 
     UserProfileDTO deleteUser(Long id);
 
-    UserProfileDTO updateUser(UserUpdateDTO userUpdateProfile, Long id);
-
     UserProfileDTO createUser(UserCreateDTO playerCreateProfile);
 
     UserCurrentDTO getCurrentUser();
+
+    UserProfileDTO updateCurrentUser(UserUpdateDTO userUpdateDTO);
 
     JWTResponse singin(LoginRequest loginRequest);
 

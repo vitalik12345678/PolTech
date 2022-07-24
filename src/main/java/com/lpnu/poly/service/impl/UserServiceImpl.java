@@ -10,12 +10,14 @@ import com.lpnu.poly.JWT.JWTUtils;
 import com.lpnu.poly.entity.*;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
 import com.lpnu.poly.exception.ExistsException;
+import com.lpnu.poly.exception.ForbiddenException;
 import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
 import com.lpnu.poly.security.UserDetailsImpl;
 import com.lpnu.poly.service.FileService;
 import com.lpnu.poly.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,6 +45,7 @@ public class UserServiceImpl implements UserService {
     private static final String USER_EXIST = "User exist";
     private static final String ROLE_NOT_EXIST = "User doesn't exist";
     private static final String ROLE_USER = "user";
+    private static final String DIFFERENT_USERS_ID = "users have different id";
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
     private final DTOConvertor dtoConvertor;
@@ -57,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Autowired
-    public UserServiceImpl(BranchRepository branchRepository, UserRepository usersRepository, DTOConvertor dtoConvertor, HobbyRepository hobbyRepository, UserBranchRepository userBranchRepository, UserHobbyRepository userHobbyRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JWTUtils jwtUtils, PasswordEncoder encoder, FileService fileService) {
+    public UserServiceImpl(BranchRepository branchRepository, UserRepository usersRepository, DTOConvertor dtoConvertor, HobbyRepository hobbyRepository, UserBranchRepository userBranchRepository, UserHobbyRepository userHobbyRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, JWTUtils jwtUtils, PasswordEncoder encoder, FileService fileService, FileService fileService1) {
         this.branchRepository = branchRepository;
         this.userRepository = usersRepository;
         this.dtoConvertor = dtoConvertor;
@@ -68,14 +71,14 @@ public class UserServiceImpl implements UserService {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.encoder = encoder;
-        this.fileService = fileService;
+        this.fileService = fileService1;
     }
 
 
     @Override
     public UserProfileDTO getUser(Long id) {
         User user = findUser(id);
-        UserProfileDTO response = dtoConvertor.convertToDTO(user,new UserProfileDTO());
+        UserProfileDTO response = dtoConvertor.convertToDTO(user, new UserProfileDTO());
         response.setAvatar(fileService.getUserFile(user.getEmail()));
         return response;
     }
@@ -86,24 +89,6 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
         return dtoConvertor.convertToDTO(user, new UserProfileDTO());
     }
-
-    @Override
-    public UserProfileDTO updateUser(UserUpdateDTO userUpdateDTO, Long id) {
-       /* User user = findUser(userUpdateDTO.getEmail());
-
-        user = dtoConvertor.convertToEntity(userUpdateDTO,user);
-
-        userRepository.save(user);
-
-        return dtoConvertor.convertToDTO(user, new UserProfileDTO());*/
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User existUser = findUser(id);
-        Optional<User> potentialUser = userRepository.findByEmail(userUpdateDTO.getEmail());
-
-        return null;
-    }
-
 
     @Override
     public UserProfileDTO createUser(UserCreateDTO userCreateDTO) {
@@ -144,6 +129,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserProfileDTO updateCurrentUser(UserUpdateDTO userUpdateDTO) {
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user = findUser(userDetails.getId());
+
+        if (userRepository.existsByEmail(userUpdateDTO.getEmail()) && !user.getEmail().equals(userUpdateDTO.getEmail())){
+            throw new ExistsException(USER_EXIST);
+        }
+
+        BeanUtils.copyProperties(userUpdateDTO, user);
+        userRepository.save(user);
+
+        UserProfileDTO response = dtoConvertor.convertToDTO(user, new UserProfileDTO());
+        response.setAvatar(fileService.getUserFile(user.getEmail()));
+        return response;
+    }
+
+    @Override
     public JWTResponse singin(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -163,7 +167,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private List<UserBranch> getUserBranchesFromClient(User user, List<String> branch) {
-        return branch.stream().map( branchName -> {
+        return branch.stream().map(branchName -> {
             UserBranch userBranch = new UserBranch();
             userBranch.setUser(user);
             userBranch.setBranch(findBranch(branchName));
