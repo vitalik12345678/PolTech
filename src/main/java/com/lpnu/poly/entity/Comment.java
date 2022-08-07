@@ -35,8 +35,8 @@ public class Comment implements Convertable {
     @Column(name = "date")
     private LocalDateTime date;
 
-    @OneToMany(mappedBy = "comment")
-    private List<File> files;
+    @Column(name = "file_uri",nullable = true)
+    private String fileURI;
 
     @OneToMany(mappedBy = "comment")
     private List<CommentLike> commentLikes;

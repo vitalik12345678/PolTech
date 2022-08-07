@@ -11,7 +11,6 @@ import com.lpnu.poly.repository.UserRepository;
 import com.lpnu.poly.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +43,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<String> uploadPostFile(MultipartFile file, String title) {
+    public String uploadPostFile(MultipartFile file, String title) {
         Post post = postRepository.findByTitle(title).orElseThrow(()-> {
             throw new NotExistsException(POST_NOT_EXIST);
         });
@@ -55,7 +54,42 @@ public class FileServiceImpl implements FileService {
         saveFileToAWS(file,fileName);
         post.setAvatarURI(fileName);
 
-        return ResponseEntity.ok(fileName);
+        return fileName;
+    }
+
+    @Override
+    public String getPostFile(String title) {
+        Post post = findPost(title);
+        return awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),post.getAvatarURI(), HttpMethod.GET);
+    }
+
+    @Override
+    public String getPostFile(Long id) {
+        Post post = findPost(id);
+        return awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),post.getAvatarURI(), HttpMethod.GET);
+    }
+
+    @Override
+    public String uploadUserFile(MultipartFile file, String email) {
+
+        User user = userRepository.findByEmail(email).orElseThrow( () -> {
+            throw new NotExistsException(USER_NOT_EXIST);
+        });
+
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss-"));
+        String fileName = date + file.getOriginalFilename();
+
+        saveFileToAWS(file,fileName);
+        user.setAvatar(fileName);
+        return fileName;
+    }
+
+    @Override
+    public String getUserFile(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow( () -> {
+            throw new NotExistsException(USER_NOT_EXIST);
+        });
+        return awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),user.getAvatar(), HttpMethod.GET);
     }
 
     private void saveFileToAWS(MultipartFile file,String fileName) {
@@ -79,34 +113,15 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    @Override
-    public ResponseEntity<String> getPostFile(String title) {
-        Post post = postRepository.findByTitle(title).orElseThrow(()-> {
+    private Post findPost(String title) {
+       return postRepository.findByTitle(title).orElseThrow(()-> {
             throw new NotExistsException(POST_NOT_EXIST);
         });
-        return ResponseEntity.ok(awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),post.getAvatarURI(), HttpMethod.GET));
     }
 
-    @Override
-    public ResponseEntity<String> uploadUserFile(MultipartFile file, String email) {
-
-        User user = userRepository.findByEmail(email).orElseThrow( () -> {
-            throw new NotExistsException(USER_NOT_EXIST);
+    private Post findPost(Long id) {
+        return postRepository.findById(id).orElseThrow(()-> {
+            throw new NotExistsException(POST_NOT_EXIST);
         });
-
-        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss-"));
-        String fileName = date + file.getOriginalFilename();
-
-        saveFileToAWS(file,fileName);
-        user.setAvatar(fileName);
-        return ResponseEntity.ok(fileName);
-    }
-
-    @Override
-    public String getUserFile(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow( () -> {
-            throw new NotExistsException(USER_NOT_EXIST);
-        });
-        return awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),user.getAvatar(), HttpMethod.GET);
     }
 }

@@ -16,6 +16,6 @@ public class PostProfileDTO implements Convertable {
     private Boolean commentsAvailable;
     private LocalDateTime publishedDate;
     private Long userId;
-    private Long fileId;
+    private String avatarURI;
     private Long id;
 }

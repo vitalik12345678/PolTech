@@ -26,9 +26,6 @@ public class Party {
     private List<PartyUser> partyUsers;
 
     @OneToMany(mappedBy = "party")
-    private List<File> files;
-
-    @OneToMany(mappedBy = "party")
     private List<Message> messages;
 
 }

@@ -8,6 +8,7 @@ import com.lpnu.poly.entity.mapper.DTOConvertor;
 import com.lpnu.poly.exception.ExistsException;
 import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
+import com.lpnu.poly.service.FileService;
 import com.lpnu.poly.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,11 @@ public class PostServiceImpl implements PostService {
     private final DTOConvertor dtoConvertor;
     private final BranchRepository branchRepository;
     private final HobbyRepository hobbyRepository;
+    private final FileService fileService;
+
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostHobbyRepository postHobbyRepository, PostBranchRepository postBranchRepository, DTOConvertor dtoConvertor, BranchRepository branchRepository, HobbyRepository hobbyRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostHobbyRepository postHobbyRepository, PostBranchRepository postBranchRepository, DTOConvertor dtoConvertor, BranchRepository branchRepository, HobbyRepository hobbyRepository, FileService fileService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.postHobbyRepository = postHobbyRepository;
@@ -53,11 +56,14 @@ public class PostServiceImpl implements PostService {
         this.dtoConvertor = dtoConvertor;
         this.branchRepository = branchRepository;
         this.hobbyRepository = hobbyRepository;
+        this.fileService = fileService;
     }
 
     @Override
     public PostProfileDTO getPost(Long id) {
-        return dtoConvertor.convertToDTO(findPost(id), new PostProfileDTO());
+        PostProfileDTO postProfileDTO = dtoConvertor.convertToDTO(findPost(id), new PostProfileDTO());
+        postProfileDTO.setAvatarURI(fileService.getPostFile(id));
+        return postProfileDTO;
     }
 
     @Override
@@ -107,30 +113,34 @@ public class PostServiceImpl implements PostService {
         postBranchRepository.saveAll(getPostBranchesFromClient(post, postUpdateDTO.getBranch()));
 
         postRepository.save(post);
-        return dtoConvertor.convertToDTO(post, new PostProfileDTO());
+
+        PostProfileDTO postProfileDTO = dtoConvertor.convertToDTO(post, new PostProfileDTO());
+        postProfileDTO.setAvatarURI(fileService.getPostFile(post.getId()));
+        return postProfileDTO;
     }
 
     @Override
     public List<PostProfileDTO> getAllPost() {
-        return postRepository.findAll().stream().map(element -> dtoConvertor.convertToDTO(element, new PostProfileDTO())).collect(Collectors.toList());
+        return postRepository.findAll().stream().map(element -> {
+            PostProfileDTO postProfileDTO = dtoConvertor.convertToDTO(element, new PostProfileDTO());
+            postProfileDTO.setAvatarURI(fileService.getPostFile(element.getId()));
+            return postProfileDTO;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public List<PostProfileDTO> getFilteredPost(String title, String days, List<String> branches, List<String> hobby,/* Pageable pageable*/int page, int size) {
 
 
-        List<Branch> branchList = branches.stream().map(element ->
-                branchRepository.findByName(element).orElseThrow(() -> {
-                    throw new NotExistsException(BRANCH_NOT_EXIST + element);
-                })
-        ).collect(Collectors.toList());
+        List<Branch> branchList = branches.stream().map(element -> branchRepository.findByName(element).orElseThrow(() -> {
+            throw new NotExistsException(BRANCH_NOT_EXIST + element);
+        })).collect(Collectors.toList());
 
         Set<PostBranch> postBranches = postBranchRepository.findDistinctByBranchIn(branchList);
 
-        Set<Hobby> hobbies = hobby.stream().map(element ->
-                hobbyRepository.findByName(element).orElseThrow(() -> {
-                    throw new NotExistsException(BRANCH_NOT_EXIST + element);
-                })).collect(Collectors.toSet());
+        Set<Hobby> hobbies = hobby.stream().map(element -> hobbyRepository.findByName(element).orElseThrow(() -> {
+            throw new NotExistsException(BRANCH_NOT_EXIST + element);
+        })).collect(Collectors.toSet());
 
         Set<PostHobby> postHobbies = postHobbyRepository.findDistinctByHobbyIn(hobbies);
 
@@ -138,8 +148,13 @@ public class PostServiceImpl implements PostService {
 
         Page<Post> resultPosts = postRepository.findDistinctByTitleContainingIgnoreCaseAndPublishedDateGreaterThanAndPostBranchesInAndPostHobbiesIn(title, LocalDateTime.parse(days), postBranches, postHobbies, pageable);
 
-        return resultPosts.getContent().stream().map(element -> dtoConvertor.convertToDTO(element, new PostProfileDTO())).collect(Collectors.toList());
+        return resultPosts.getContent().stream().map(element -> {
+            PostProfileDTO postProfileDTO = dtoConvertor.convertToDTO(element, new PostProfileDTO());
+            postProfileDTO.setAvatarURI(fileService.getPostFile(element.getId()));
+            return postProfileDTO;
+        }).collect(Collectors.toList());
     }
+
 
     private List<PostHobby> getPostHobbyFromClient(Post post, List<String> hobby) {
         return hobby.stream().map(hobbyName -> {

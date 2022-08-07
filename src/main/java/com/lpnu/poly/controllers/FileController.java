@@ -20,28 +20,26 @@ public class FileController {
 
     @GetMapping("/v1/post/")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<String> getPostAvatar(@RequestParam("title")String title){
-        return fileService.getPostFile(title);
+    public ResponseEntity<String> getPostAvatar(@RequestParam("title") String title) {
+        return ResponseEntity.ok(fileService.getPostFile(title));
     }
 
     @GetMapping("/v1/user/")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<String> getUserAvatar(@RequestParam("email")String email){
-        return ResponseEntity.ok( fileService.getUserFile(email) );
+    public ResponseEntity<String> getUserAvatar(@RequestParam("email") String email) {
+        return ResponseEntity.ok(fileService.getUserFile(email));
     }
 
     @PostMapping("/v1/post/")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<String> uploadPostAvatar(@RequestParam("file")MultipartFile file,
-                                  @RequestParam("title")String title){
-        return fileService.uploadPostFile(file,title);
+    public ResponseEntity<String> uploadPostAvatar(@RequestParam("file") MultipartFile file, @RequestParam("title") String title) {
+        return ResponseEntity.ok(fileService.uploadPostFile(file, title));
     }
 
     @PostMapping("/v1/user/")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<String> uploadUserAvatar(@RequestParam("file")MultipartFile file,
-                                  @RequestParam("email")String email){
-        return fileService.uploadUserFile(file,email);
+    public ResponseEntity<String> uploadUserAvatar(@RequestParam("file") MultipartFile file, @RequestParam("email") String email) {
+        return ResponseEntity.ok(fileService.uploadUserFile(file, email));
     }
 
 }

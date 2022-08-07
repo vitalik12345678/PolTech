@@ -10,7 +10,6 @@ import com.lpnu.poly.JWT.JWTUtils;
 import com.lpnu.poly.entity.*;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
 import com.lpnu.poly.exception.ExistsException;
-import com.lpnu.poly.exception.ForbiddenException;
 import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
 import com.lpnu.poly.security.UserDetailsImpl;
@@ -45,7 +44,6 @@ public class UserServiceImpl implements UserService {
     private static final String USER_EXIST = "User exist";
     private static final String ROLE_NOT_EXIST = "User doesn't exist";
     private static final String ROLE_USER = "user";
-    private static final String DIFFERENT_USERS_ID = "users have different id";
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
     private final DTOConvertor dtoConvertor;

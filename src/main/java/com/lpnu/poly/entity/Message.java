@@ -31,6 +31,9 @@ public class Message implements Convertable {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "file_uri",nullable = true)
+    private String fileURI;
+
     @Column(name = "message_date", nullable = false)
     private LocalDateTime messageDate;
 

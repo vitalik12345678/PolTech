@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -23,9 +22,6 @@ public class Chat {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "second_user_id", nullable = false)
     private User secondUser;
-
-    @OneToMany(mappedBy = "chat")
-    private List<File> files;
 
     @OneToMany(mappedBy = "chat")
     private List<Message> messages;
