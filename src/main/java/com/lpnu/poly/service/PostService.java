@@ -19,4 +19,8 @@ public interface PostService {
     List<PostProfileDTO> getAllPost();
 
     List<PostProfileDTO> getFilteredPost(String title, String days, List<String> branches, List<String> hobby, /*Pageable pageable*/int page, int size);
+
+    Boolean createLike(Long postId);
+
+    Boolean deleteLike(Long postId);
 }
