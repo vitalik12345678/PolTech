@@ -52,6 +52,18 @@ public class PostController {
         return ResponseEntity.ok(postService.createPost(postCreateDTO));
     }
 
+    @PostMapping("v1/like/{id}")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
+    public ResponseEntity<Boolean> createLike(@PathVariable ("id") Long postId){
+        return ResponseEntity.ok(postService.createLike(postId));
+    }
+
+    @DeleteMapping("v1/{id}/like")
+    @PreAuthorize("hasRole('user') or hasRole('admin')")
+    public ResponseEntity<Boolean> deleteLike (@PathVariable("id") Long postId){
+        return ResponseEntity.ok(postService.deleteLike(postId));
+    }
+
     @DeleteMapping("v1/{id}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<PostProfileDTO> deletePost(@PathVariable("id") Long id) {

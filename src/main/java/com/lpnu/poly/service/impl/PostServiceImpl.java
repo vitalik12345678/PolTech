@@ -8,6 +8,7 @@ import com.lpnu.poly.entity.mapper.DTOConvertor;
 import com.lpnu.poly.exception.ExistsException;
 import com.lpnu.poly.exception.NotExistsException;
 import com.lpnu.poly.repository.*;
+import com.lpnu.poly.security.UserDetailsImpl;
 import com.lpnu.poly.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ public class PostServiceImpl implements PostService {
     private static final String BRANCH_NOT_EXIST = "Branch doesn't exist ";
     private static final String HOBBY_NOT_EXIST = "Hobby doesn't exist ";
     private static final String POST_EXIST = "Post exists ";
+    private static final String LIKE_DONT_EXISTS = "Like don't exists";
+    private static final String LIKE_EXISTS = "Like exists";
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostHobbyRepository postHobbyRepository;
@@ -43,9 +46,10 @@ public class PostServiceImpl implements PostService {
     private final DTOConvertor dtoConvertor;
     private final BranchRepository branchRepository;
     private final HobbyRepository hobbyRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostHobbyRepository postHobbyRepository, PostBranchRepository postBranchRepository, DTOConvertor dtoConvertor, BranchRepository branchRepository, HobbyRepository hobbyRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostHobbyRepository postHobbyRepository, PostBranchRepository postBranchRepository, DTOConvertor dtoConvertor, BranchRepository branchRepository, HobbyRepository hobbyRepository, PostLikeRepository postLikeRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.postHobbyRepository = postHobbyRepository;
@@ -53,6 +57,7 @@ public class PostServiceImpl implements PostService {
         this.dtoConvertor = dtoConvertor;
         this.branchRepository = branchRepository;
         this.hobbyRepository = hobbyRepository;
+        this.postLikeRepository = postLikeRepository;
     }
 
     @Override
@@ -139,6 +144,35 @@ public class PostServiceImpl implements PostService {
         Page<Post> resultPosts = postRepository.findDistinctByTitleContainingIgnoreCaseAndPublishedDateGreaterThanAndPostBranchesInAndPostHobbiesIn(title, LocalDateTime.parse(days), postBranches, postHobbies, pageable);
 
         return resultPosts.getContent().stream().map(element -> dtoConvertor.convertToDTO(element, new PostProfileDTO())).collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean createLike(Long postId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Post post = findPost(postId);
+        User user = findUser(userDetails.getId());
+
+        if (postLikeRepository.existsByPostAndUser(post,user)){
+            throw new ExistsException(LIKE_EXISTS);
+        }else {
+            PostLike postLike = new PostLike();
+            postLike.setPost(post);
+            postLike.setUser(user);
+            postLikeRepository.save(postLike);
+            return true;
+        }
+    }
+
+    @Override
+    public Boolean deleteLike(Long postId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Post post = findPost(postId);
+        User user = findUser(userDetails.getId());
+        postLikeRepository.delete(postLikeRepository.findByPostAndUser(post,user).orElseThrow( () ->
+        {
+            throw new NotExistsException(LIKE_DONT_EXISTS);
+        }));
+        return true;
     }
 
     private List<PostHobby> getPostHobbyFromClient(Post post, List<String> hobby) {
