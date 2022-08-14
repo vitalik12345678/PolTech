@@ -15,4 +15,8 @@ public interface CommentService {
     CommentProfileDTO deleteComment(Long id);
 
     CommentProfileDTO updateComment(Long id, String description);
+
+    Boolean addLike(Long commentId);
+
+    Boolean deleteLike(Long commentId);
 }

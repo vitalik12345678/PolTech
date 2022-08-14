@@ -21,7 +21,7 @@ public class FileController {
     @GetMapping("/v1/post/")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
     public ResponseEntity<String> getPostAvatar(@RequestParam("title")String title){
-        return fileService.getPostFile(title);
+        return ResponseEntity.ok( fileService.getPostFile(title) );
     }
 
     @GetMapping("/v1/user/")

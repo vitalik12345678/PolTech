@@ -80,11 +80,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<String> getPostFile(String title) {
+    public String getPostFile(String title) {
         Post post = postRepository.findByTitle(title).orElseThrow(()-> {
             throw new NotExistsException(POST_NOT_EXIST);
         });
-        return ResponseEntity.ok(awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),post.getAvatarURI(), HttpMethod.GET));
+        return awss3Service.generateURI(BucketName.BUCKET_NAME.getBucketName(),post.getAvatarURI(), HttpMethod.GET);
     }
 
     @Override

@@ -24,25 +24,37 @@ public class CommentController {
 
     @PostMapping("v1/")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<CommentProfileDTO> addComment(@Valid @RequestBody CommentCreateDTO commentCreateDTO){
+    public ResponseEntity<CommentProfileDTO> addComment(@Valid @RequestBody CommentCreateDTO commentCreateDTO) {
         return commentService.addComment(commentCreateDTO);
+    }
+
+    @PostMapping("v1/{id}/like")
+    @PreAuthorize(("hasRole('user') or hasRole('admin')"))
+    public ResponseEntity<Boolean> addLike(@PathVariable("id") Long commentId) {
+        return ResponseEntity.ok(commentService.addLike(commentId));
     }
 
     @GetMapping("v1/byPost/{id}")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<List<CommentProfileDTO>> getCommentByPost(@PathVariable("id") Long id){
+    public ResponseEntity<List<CommentProfileDTO>> getCommentByPost(@PathVariable("id") Long id) {
         return commentService.getCommentByPost(id);
     }
 
     @PutMapping("v1/{id}")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<CommentProfileDTO> updateComment(@PathVariable Long id,@RequestParam("description") String description){
-       return ResponseEntity.ok(commentService.updateComment(id,description));
+    public ResponseEntity<CommentProfileDTO> updateComment(@PathVariable Long id, @RequestParam("description") String description) {
+        return ResponseEntity.ok(commentService.updateComment(id, description));
+    }
+
+    @DeleteMapping("v1/{id}/like")
+    @PreAuthorize(("hasRole('user') or hasRole('admin')"))
+    public ResponseEntity<Boolean> deleteLike(@PathVariable("id") Long commentId) {
+        return ResponseEntity.ok(commentService.deleteLike(commentId));
     }
 
     @DeleteMapping("v1/{id}")
     @PreAuthorize("hasRole('user') or hasRole('admin')")
-    public ResponseEntity<CommentProfileDTO> deleteComment(@PathVariable("id") Long id){
+    public ResponseEntity<CommentProfileDTO> deleteComment(@PathVariable("id") Long id) {
         return ResponseEntity.ok(commentService.deleteComment(id));
     }
 

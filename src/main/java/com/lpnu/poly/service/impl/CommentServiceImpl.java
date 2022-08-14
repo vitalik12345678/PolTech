@@ -3,11 +3,13 @@ package com.lpnu.poly.service.impl;
 import com.lpnu.poly.DTO.comment.CommentCreateDTO;
 import com.lpnu.poly.DTO.comment.CommentProfileDTO;
 import com.lpnu.poly.entity.Comment;
+import com.lpnu.poly.entity.CommentLike;
 import com.lpnu.poly.entity.Post;
 import com.lpnu.poly.entity.User;
 import com.lpnu.poly.entity.mapper.DTOConvertor;
 import com.lpnu.poly.exception.ForbiddenException;
 import com.lpnu.poly.exception.NotExistsException;
+import com.lpnu.poly.repository.CommentLikeRepository;
 import com.lpnu.poly.repository.CommentRepository;
 import com.lpnu.poly.repository.PostRepository;
 import com.lpnu.poly.repository.UserRepository;
@@ -42,13 +44,15 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final DTOConvertor dtoConvertor;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Autowired
-    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository, DTOConvertor dtoConvertor) {
+    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository, DTOConvertor dtoConvertor, CommentLikeRepository commentLikeRepository) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.dtoConvertor = dtoConvertor;
+        this.commentLikeRepository = commentLikeRepository;
     }
 
     @Override
@@ -58,8 +62,8 @@ public class CommentServiceImpl implements CommentService {
         Post post = findPost(commentCreateDTO.getPostId());
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (!Boolean.TRUE.equals(post.getCommentsAvailable()) && !userDetails.getId().equals(post.getUser().getId())){
-                throw new ForbiddenException(NOT_ACCESS);
+        if (!Boolean.TRUE.equals(post.getCommentsAvailable()) && !userDetails.getId().equals(post.getUser().getId())) {
+            throw new ForbiddenException(NOT_ACCESS);
         }
         User user = findUser(userDetails.getId());
         Comment comment = new Comment();
@@ -84,7 +88,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentProfileDTO deleteComment(Long id) {
         Comment comment = findComment(id);
-        checkOnIdValidity((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),comment);
+        checkOnIdValidity((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal(), comment);
         commentRepository.delete(comment);
         return dtoConvertor.convertToDTO(comment, new CommentProfileDTO());
     }
@@ -92,13 +96,41 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentProfileDTO updateComment(Long id, String description) {
         Comment comment = findComment(id);
-        checkOnIdValidity((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),comment);
+        checkOnIdValidity((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal(), comment);
         comment.setDescription(description);
         commentRepository.save(comment);
         return dtoConvertor.convertToDTO(comment, new CommentProfileDTO());
     }
 
-    private void checkOnIdValidity(UserDetailsImpl userDetails,Comment comment) {
+    @Override
+    public Boolean addLike(Long commentId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Comment comment = findComment(commentId);
+        User user = findUser(userDetails.getId());
+        CommentLike existCommentLike = commentLikeRepository.findByUserAndComment(user, comment).orElseGet(() -> {
+            CommentLike commentLike = new CommentLike();
+            commentLike.setComment(comment);
+            commentLike.setUser(user);
+            return commentLike;
+        });
+
+        commentLikeRepository.save(existCommentLike);
+
+        return true;
+    }
+
+    @Override
+    public Boolean deleteLike(Long commentId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Comment comment = findComment(commentId);
+        CommentLike commentLike = commentLikeRepository.findByUserAndComment(findUser(userDetails.getId()), comment).orElseThrow(() -> {
+            throw new NotExistsException(COMMENT_NOT_EXIST);
+        });
+        commentLikeRepository.delete(commentLike);
+        return true;
+    }
+
+    private void checkOnIdValidity(UserDetailsImpl userDetails, Comment comment) {
         if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority(ROLE_ADMIN)) && !userDetails.getId().equals(comment.getUser().getId())) {
             throw new NotExistsException(DIFFERENT_USER_ID_AND_COMMENT_ID);
         }

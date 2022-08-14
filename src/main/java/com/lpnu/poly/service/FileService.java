@@ -7,7 +7,7 @@ public interface FileService {
 
     ResponseEntity<String> uploadPostFile(MultipartFile file, String title);
 
-    ResponseEntity<String> getPostFile(String title);
+    String getPostFile(String title);
 
     ResponseEntity<String> uploadUserFile(MultipartFile file,String email);
 
